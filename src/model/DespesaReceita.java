@@ -27,14 +27,19 @@ import dao.DespesaReceitaDAO;
 @Entity
 @Table(name="despesa_receita")
 @NamedQueries({
-		@NamedQuery(name="DespesaReceita.findAll", query="SELECT d FROM DespesaReceita d"),
-		@NamedQuery(name=DespesaReceita.REMOVER_POR_PARCELA_ID, query="DELETE FROM DespesaReceita d WHERE d.parcelaId = :parcela_id")
+		@NamedQuery(name=DespesaReceita.LISTAR_TUDO, query="SELECT d FROM DespesaReceita d"),
+		@NamedQuery(name=DespesaReceita.REMOVER_POR_PARCELA_ID, query="DELETE FROM DespesaReceita d WHERE d.parcelaId = :parcela_id AND d.dataMovimentacao = null"),
+		@NamedQuery(name=DespesaReceita.LISTAR_POR_PARCELA_ID, query="SELECT d FROM DespesaReceita d WHERE d.parcelaId = :parcela_id AND d.dataMovimentacao = null")
 })
 public class DespesaReceita implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	@Transient
 	public static final String REMOVER_POR_PARCELA_ID = "DespesaReceita.removerPorParcelaId";
+	@Transient
+	public static final String LISTAR_TUDO = "DespesaReceita.findAll";
+	@Transient
+	public static final String LISTAR_POR_PARCELA_ID = "DespesaReceita.findByParcelaId";
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -179,6 +184,6 @@ public class DespesaReceita implements Serializable {
 		DespesaReceitaDAO dao = new DespesaReceitaDAO();
 		
 		this.dataVencimento = this.dataVencimento.withDayOfMonth(dataVencimento);
-		dao.atualiza(this);
+		dao.atualizar(this);
 	}
 }

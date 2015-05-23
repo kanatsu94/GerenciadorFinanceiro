@@ -68,7 +68,7 @@ public class ContaController {
 	public void atualizar(Conta conta){
 		this.type = 1;
 		this.title = TITLE_UPDATE_CONTA;
-		if(this.dao.atualiza(conta)){
+		if(this.dao.atualizar(conta)){
 			this.msg = MSG_UPDATE_SUCESSO;
 		}
 		else{

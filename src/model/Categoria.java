@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 
 
@@ -9,9 +10,12 @@ import javax.persistence.*;
  * 
  */
 @Entity
-@NamedQuery(name="Categoria.findAll", query="SELECT c FROM Categoria c")
+@NamedQuery(name=Categoria.LISTAR_TUDO, query="SELECT c FROM Categoria c")
 public class Categoria implements Serializable {
 	private static final long serialVersionUID = 1L;
+
+	@Transient
+	public static final String LISTAR_TUDO = "Categoria.findAll";
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

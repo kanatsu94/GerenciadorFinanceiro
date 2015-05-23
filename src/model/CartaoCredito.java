@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * The persistent class for the cartao_credito database table.
@@ -19,9 +20,12 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "cartao_credito")
-@NamedQuery(name = "CartaoCredito.findAll", query = "SELECT c FROM CartaoCredito c")
+@NamedQuery(name = CartaoCredito.LISTAR_TUDO, query = "SELECT c FROM CartaoCredito c")
 public class CartaoCredito implements Serializable {
 	private static final long serialVersionUID = 1L;
+
+	@Transient
+	public static final String LISTAR_TUDO = "CartaoCredito.findAll";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +35,13 @@ public class CartaoCredito implements Serializable {
 
 	// DIA DO MES EM QUE A FATURA VENCE
 	private short vencimento;
-	
-	// QUANTIDADE DE DIAS ANTES DO VENCIMENTO DA FATURA, DETERMINA O FECHAMENTO DA FATURA.
+
+	// QUANTIDADE DE DIAS ANTES DO VENCIMENTO DA FATURA, DETERMINA O FECHAMENTO
+	// DA FATURA.
 	// NAO E A DATA DE FECHAMENTO!
-	// E A QUANTIDADE DE DIAS ANTES DO VENCIMENTO. A DATA DE FECHAMENTO E CALCULADA.
-	@Column(name="dias_fechamento")
+	// E A QUANTIDADE DE DIAS ANTES DO VENCIMENTO. A DATA DE FECHAMENTO E
+	// CALCULADA.
+	@Column(name = "dias_fechamento")
 	private short diasFechamento;
 
 	// bi-directional many-to-one association to DespesaReceita
@@ -48,9 +54,11 @@ public class CartaoCredito implements Serializable {
 	}
 
 	// CONSTRUTOR COM OS ATRIBUTOS INDISPENSAVEIS PARA O OBJETO.
-	public CartaoCredito(String descricao, short vencimento) {
+	public CartaoCredito(String descricao, short vencimento,
+			short diasFechamento) {
 		this.setDescricao(descricao);
 		this.setVencimento(vencimento);
+		this.setDiasFechamento(diasFechamento);
 	}
 
 	public int getId() {
@@ -64,8 +72,8 @@ public class CartaoCredito implements Serializable {
 	public short getVencimento() {
 		return this.vencimento;
 	}
-	
-	public short getDiasFechamento(){
+
+	public short getDiasFechamento() {
 		return this.diasFechamento;
 	}
 
@@ -80,8 +88,7 @@ public class CartaoCredito implements Serializable {
 
 	public void setVencimento(short vencimento) {
 		this.vencimento = vencimento;
-
-		for(DespesaReceita dr : this.despesaReceitas){
+		for (DespesaReceita dr : this.despesaReceitas) {
 			dr.atualizaVencimento(vencimento);
 		}
 	}
@@ -96,9 +103,12 @@ public class CartaoCredito implements Serializable {
 
 		return despesaReceita;
 	}
-	
-	public void setDiasFechamento(short diasFechamento){
-		this.diasFechamento = diasFechamento;
+
+	public void setDiasFechamento(short diasFechamento) {
+		if (diasFechamento < 1 || diasFechamento > 31)
+			;
+		else
+			this.diasFechamento = diasFechamento;
 	}
 
 	public DespesaReceita removeDespesaReceita(DespesaReceita despesaReceita) {
@@ -108,4 +118,19 @@ public class CartaoCredito implements Serializable {
 		return despesaReceita;
 	}
 
+	// VALIDA O VENCIMENTO
+	public boolean validaVencimento(short vencimento) {
+		if (vencimento < 1 || vencimento > 31) {
+			return false;
+		} else
+			return true;
+	}
+	
+	// VALIDA O DIA DE FECHAMENTO
+	public boolean validaDiasFechamento(short diasFechamento){
+		if (diasFechamento < 1 || diasFechamento > 31) {
+			return false;
+		} else
+			return true;
+	}
 }

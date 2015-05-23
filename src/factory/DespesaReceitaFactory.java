@@ -15,9 +15,10 @@ import dao.DespesaReceitaDAO;
 import dao.ParcelaSeqDAO;
 
 public abstract class DespesaReceitaFactory {
-	private static String ERRO_DATA_VENCIMENTO = "- A data de vencimento é anterior a data atual.\n Se a data estiver correta, informe a data de movimentação.";
+	private static String ERRO_DATA_VENCIMENTO = "- A data de vencimento é anterior a data atual.\n Se a data estiver correta, informe a data da movimentação.";
 	private static String ERRO_SALVAR = "Erro ao salvar ";
-	private static String ERRO_REPETIR = "Não é possível repetir despesas/receitas com data de vencimento anterior a data atual.";
+	private static String ERRO_REPETIR = "- Não é possível repetir despesas/receitas com data de vencimento anterior a data atual.";
+	private static String ERRO_VALOR = "- O valor deve ser maior do que zero.";
 
 	public static ArrayList<String> novaDespesaReceita(String descricao,
 			LocalDate dataVencimento, LocalDate dataMovimentacao, Double valor,
@@ -31,9 +32,10 @@ public abstract class DespesaReceitaFactory {
 		DespesaReceitaDAO daoDespesaReceita = new DespesaReceitaDAO();
 		LocalDate date_1 = dataVencimento;
 		LocalDate date_2 = new LocalDate();
+		int diaFechamento = 0;
 
 		ArrayList<String> erros = new ArrayList<String>();
-		erros.addAll(validaData(dataVencimento, dataMovimentacao, parcelas));
+		erros.addAll(validar(dataVencimento, dataMovimentacao, parcelas, valor));
 
 		if (erros.isEmpty()) {
 
@@ -50,7 +52,11 @@ public abstract class DespesaReceitaFactory {
 				parcelaId = parcelaSeq.getSequencia();
 
 				// ATUALIZA O NOVO VALOR.
-				daoParcela.atualiza(parcelaSeq);
+				daoParcela.atualizar(parcelaSeq);
+			}
+			
+			if (cartaoCredito != null) {
+				diaFechamento = date_1.withDayOfMonth(cartaoCredito.getVencimento()).minusDays(cartaoCredito.getDiasFechamento()).getDayOfMonth();
 			}
 
 			// LACO DE REPETICAO QUE IRA CRIAR AS DESPESAS/RECEITAS.
@@ -61,9 +67,8 @@ public abstract class DespesaReceitaFactory {
 				// CASO SEJA RELACIONADO A UM CARTAO, ENTAO TEMOS QUE DEFINIR
 				// A DATA DE VENCIMENTO.
 				if (cartaoCredito != null) {
-					// SE A DATA ATUAL FOR POSTERIOR A DATA DA FATURA, ENTAO A
-					// DESPESA VAI PARA O PROXIMO MES.
-					if (date_2.getDayOfMonth() > cartaoCredito.getVencimento()) {
+					// AQUI DEFINIMOS SE A DESPESA IRA ENTRAR NO MES ATUAL, OU NO PROXIMO.
+					if (date_2.getDayOfMonth() >= diaFechamento) {
 						// A DATA DE VENCIMENTO RECEBE A DATA ATUAL, COM O VALOR
 						// DO DIA
 						// SUBSTITUIDO PELO DIA DA FATURA DO CARTAO.
@@ -121,8 +126,8 @@ public abstract class DespesaReceitaFactory {
 		return erros;
 	}
 
-	private static ArrayList<String> validaData(LocalDate dataVencimento,
-			LocalDate dataMovimentacao, int parcelas) {
+	private static ArrayList<String> validar(LocalDate dataVencimento,
+			LocalDate dataMovimentacao, int parcelas, Double valor) {
 
 		ArrayList<String> erros = new ArrayList<>();
 
@@ -135,6 +140,10 @@ public abstract class DespesaReceitaFactory {
 			// SE FOR, A DESPESA/RECEITA DEVE POSSUIR UMA DATA DE MOVIMENTACAO.
 			if (dataMovimentacao == null)
 				erros.add(ERRO_DATA_VENCIMENTO);
+		}
+		
+		if(valor <= 0){
+			erros.add(ERRO_VALOR);
 		}
 
 		return erros;
