@@ -41,7 +41,7 @@ public class DespesaView extends JInternalFrame {
 				.addComponent(panel, GroupLayout.DEFAULT_SIZE, 470, Short.MAX_VALUE)
 		);
 		
-		JLabel lblTeste = new JLabel("TESTE");
+		JLabel lblTeste = new JLabel("TESTE HHUAHAUHAUAHu");
 		panel.add(lblTeste);
 		getContentPane().setLayout(groupLayout);
 	}
