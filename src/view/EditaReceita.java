@@ -31,7 +31,7 @@ public class EditaReceita extends JInternalFrame {
 		getContentPane().setLayout(null);
 		
 		Label label = new Label("*Descri\u00E7\u00E3o");
-		label.setBounds(95, 8, 62, 22);
+		label.setBounds(95, 8, 77, 22);
 		getContentPane().add(label);
 		
 		TextField textField = new TextField();
@@ -60,15 +60,15 @@ public class EditaReceita extends JInternalFrame {
 		getContentPane().add(label_1);
 		
 		Label label_2 = new Label("*Data de Vencimento");
-		label_2.setBounds(126, 82, 121, 22);
+		label_2.setBounds(126, 82, 137, 22);
 		getContentPane().add(label_2);
 		
 		Label label_3 = new Label("*Receita Fixa");
-		label_3.setBounds(284, 82, 77, 22);
+		label_3.setBounds(284, 82, 93, 22);
 		getContentPane().add(label_3);
 		
 		Label label_4 = new Label("*Categoria");
-		label_4.setBounds(383, 82, 62, 22);
+		label_4.setBounds(383, 82, 77, 22);
 		getContentPane().add(label_4);
 		
 		JComboBox conta = new JComboBox();
