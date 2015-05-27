@@ -13,6 +13,12 @@ import javax.swing.JDesktopPane;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 
+import controller.MainController;
+import javax.swing.JLabel;
+import java.awt.Font;
+import java.awt.Color;
+import javax.swing.SwingConstants;
+
 public class PrincipalView extends javax.swing.JFrame {
 
 	/**
@@ -71,6 +77,8 @@ public class PrincipalView extends javax.swing.JFrame {
 				}
 			}
 		});
+		MainController.initFactory();
+		lblCarregando.setVisible(false);
 	}
 
 	public static JDesktopPane getPainel() {
@@ -93,14 +101,12 @@ public class PrincipalView extends javax.swing.JFrame {
 
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
-				// CAIXA DE DIALOGO QUE RETORNA UM INTEIRO
-				int resposta = JOptionPane.showConfirmDialog(null,
-						"Deseja fechar o sistema?", "Finalizar",
-						JOptionPane.YES_NO_OPTION);
-
 				// SIM = 0, NAO = 1
-				if (resposta == 0) {
+				if (JOptionPane.showConfirmDialog(null,
+						"Deseja fechar o sistema?", "Finalizar",
+						JOptionPane.YES_NO_OPTION) == 0) {
 					// FECHA AS CONEXOES COM O BANCO
+					MainController.closeConnections();
 					System.exit(0);
 				}
 
@@ -144,12 +150,27 @@ public class PrincipalView extends javax.swing.JFrame {
 
 		btnRelatorios = new JButton(RELATORIOS_BTN_MENU);
 		menuBar.add(btnRelatorios);
+		
+		lblCarregando.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCarregando.setForeground(Color.WHITE);
+		lblCarregando.setFont(new Font("Arial", Font.BOLD, 26));
+
 		GroupLayout groupLayout = new GroupLayout(telaPrincipal);
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addGap(342)
+					.addComponent(lblCarregando)
+					.addContainerGap(348, Short.MAX_VALUE))
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+					.addGap(256)
+					.addComponent(lblCarregando)
+					.addContainerGap(264, Short.MAX_VALUE))
+		);
 		telaPrincipal.setLayout(groupLayout);
-		groupLayout.setHorizontalGroup(groupLayout.createParallelGroup(
-				Alignment.LEADING).addGap(0, 794, Short.MAX_VALUE));
-		groupLayout.setVerticalGroup(groupLayout.createParallelGroup(
-				Alignment.LEADING).addGap(0, 546, Short.MAX_VALUE));
 
 		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(
 				getContentPane());
@@ -230,4 +251,5 @@ public class PrincipalView extends javax.swing.JFrame {
 	private String CARTAO_BTN_MENU = "Cartão de Crédito";
 	private DespesaView despesaView;
 	private ReceitaView receitaView;
+	private static JLabel lblCarregando = new JLabel("Aguarde...");
 }

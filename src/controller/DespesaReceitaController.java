@@ -13,11 +13,14 @@ import model.Tipo;
 
 import org.joda.time.LocalDate;
 
+import table.DespesaReceitaTableModel;
 import dao.DespesaReceitaDAO;
+import dao.TipoDAO;
 import factory.DespesaReceitaFactory;
 
 public class DespesaReceitaController {
 	private DespesaReceitaDAO dao;
+	private TipoDAO daoTipo;
 
 	private static String TITLE_ADD = "Nova ";
 	private static String TITLE_REMOVER = "Remover ";
@@ -46,6 +49,7 @@ public class DespesaReceitaController {
 	public DespesaReceitaController() {
 		this.msg = "";
 		this.dao = new DespesaReceitaDAO();
+		this.daoTipo = new TipoDAO();
 	}
 
 	// RECUPERA TODOS OS REGISTROS DE DESPESA/RECEITA DO
@@ -68,6 +72,18 @@ public class DespesaReceitaController {
 		lista = dao.consultaDinamica(dr);
 
 		return lista;
+	}
+	
+	public DespesaReceitaTableModel getTableModel(Tipo t){
+		return new DespesaReceitaTableModel(listarTudo(t));
+	}
+	
+	public DespesaReceitaTableModel getReceitaTableModel(){
+		return new DespesaReceitaTableModel(listarTudo(daoTipo.procurar(2)));
+	}
+	
+	public DespesaReceitaTableModel getDespesaTableModel(){
+		return new DespesaReceitaTableModel(listarTudo(daoTipo.procurar(1)));
 	}
 
 	// SALVA UMA DESPESA/RECEITA

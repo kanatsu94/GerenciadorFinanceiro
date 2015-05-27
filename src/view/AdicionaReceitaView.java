@@ -25,13 +25,13 @@ import javax.swing.JToggleButton;
 
 import net.miginfocom.swing.MigLayout;
 
-public class AdicionaReceita extends JInternalFrame {
+public class AdicionaReceitaView extends JInternalFrame {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public AdicionaReceita() {
+	public AdicionaReceitaView() {
 		initComponents();
 	}
 

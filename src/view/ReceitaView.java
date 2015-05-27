@@ -22,6 +22,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.event.InternalFrameEvent;
+import javax.swing.JTable;
+
+import controller.DespesaReceitaController;
 
 public class ReceitaView extends JInternalFrame {
 	/*
@@ -38,6 +41,8 @@ public class ReceitaView extends JInternalFrame {
 		setTitle(NOME_TELA);
 		setClosable(true);
 		setIconifiable(true);
+		
+		controllerDespesaReceita = new DespesaReceitaController();
 
 		JButton btnAdicionarReceita = new JButton(BTN_ADICIONAR);
 		btnAdicionarReceita
@@ -67,6 +72,10 @@ public class ReceitaView extends JInternalFrame {
 		fieldBusca.setColumns(10);
 
 		scrollPaneTabela = new JScrollPane();
+		
+		table = new JTable();
+		
+		carregaTabela();
 
 		btnBuscar = new JButton(BTN_BUSCAR);
 
@@ -168,13 +177,19 @@ public class ReceitaView extends JInternalFrame {
 												GroupLayout.PREFERRED_SIZE, 28,
 												GroupLayout.PREFERRED_SIZE)
 										.addGap(8)));
+		
+		scrollPaneTabela.setViewportView(table);
 		getContentPane().setLayout(groupLayout);
 		addReceitaView = null;
+	}
+	
+	private void carregaTabela(){
+		this.table.setModel(controllerDespesaReceita.getReceitaTableModel());
 	}
 
 	private void addReceitaView(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_itemEstoqueProdutoActionPerformed
 		if (addReceitaView == null) {
-			addReceitaView = new AdicionaReceita();
+			addReceitaView = new AdicionaReceitaView();
 			PrincipalView.getPainel().add(addReceitaView);
 			addReceitaView.setIconifiable(false);
 			addReceitaView.setClosable(false);
@@ -218,7 +233,10 @@ public class ReceitaView extends JInternalFrame {
 	private JScrollPane scrollPaneTabela;
 	private JComboBox comboFiltro;
 	private Vector<String> vector = new Vector<String>();
-	private AdicionaReceita addReceitaView;
+	private AdicionaReceitaView addReceitaView;
 	private JTextField fieldBusca;
 	private JButton btnBuscar;
+	private JTable table;
+	
+	private DespesaReceitaController controllerDespesaReceita;
 }
