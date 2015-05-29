@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -14,11 +15,13 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import net.miginfocom.swing.MigLayout;
 
 import org.jdatepicker.impl.JDatePanelImpl;
-import org.jdatepicker.impl.JDatePickerImpl;
+import util.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 
 import util.DateLabelFormatter;
@@ -44,11 +47,16 @@ public class AdicionaReceitaView extends JInternalFrame {
 		this.p.put("text.today", "Hoje");
 		this.p.put("text.month", "Mês");
 		this.p.put("text.year", "Ano");
-		
-		this.model = new UtilDateModel();
-		this.datePanel = new JDatePanelImpl(this.model, this.p);
-		this.datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
 
+		this.modelValidade = new UtilDateModel();
+		this.modelPagamento = new UtilDateModel();
+		this.panelValidade = new JDatePanelImpl(this.modelValidade, this.p);
+		this.panelPagamento = new JDatePanelImpl(this.modelPagamento, this.p);
+		this.pickerValidade = new JDatePickerImpl(panelValidade, new DateLabelFormatter());
+		this.pickerPagamento = new JDatePickerImpl(panelPagamento, new DateLabelFormatter());
+		
+		this.pickerPagamento.setButtonEnable(false);
+		
 		this.lblDescricao = new JLabel(LBL_DESCRICAO);
 		this.lblValor = new JLabel(LBL_VALOR);
 		this.lblDataVencimento = new JLabel(LBL_DATA_VENCIMENTO);
@@ -67,15 +75,10 @@ public class AdicionaReceitaView extends JInternalFrame {
 
 		this.fieldRepetir = new JTextField();
 		this.fieldRepetir.setColumns(10);
-		this.fieldDataPagamento = new JTextField();
-		this.fieldDataPagamento.setColumns(10);
-		this.fieldDataPagamento.setEnabled(false);
 		this.fieldDescricao = new JTextField();
 		this.fieldDescricao.setColumns(10);
 		this.fieldValor = new JTextField();
 		this.fieldValor.setColumns(10);
-		this.fieldDataVencimento = new JTextField();
-		this.fieldDataVencimento.setColumns(10);
 
 		this.btnCancelar = new JButton(BTN_CANCELAR);
 		btnCancelar.addActionListener(new java.awt.event.ActionListener() {
@@ -97,7 +100,7 @@ public class AdicionaReceitaView extends JInternalFrame {
 		getContentPane().add(lblDescricao, "cell 0 0,alignx left,aligny top");
 		getContentPane().add(lblValor, "cell 0 2,alignx left,aligny top");
 		getContentPane().add(fieldValor, "cell 0 3,alignx left,aligny center");
-		getContentPane().add(datePicker,
+		getContentPane().add(pickerValidade,
 				"cell 2 3,growx,aligny center");
 		getContentPane().add(lblDataVencimento, "cell 2 2,growx,aligny top");
 		getContentPane().add(lblReceitaFixa,
@@ -110,7 +113,7 @@ public class AdicionaReceitaView extends JInternalFrame {
 		getContentPane().add(lblPago, "cell 8 2,alignx left,aligny top");
 		getContentPane().add(lblDataPagamento,
 				"cell 10 2,alignx left,aligny top");
-		getContentPane().add(fieldDataPagamento,
+		getContentPane().add(pickerPagamento,
 				"cell 10 3,growx,aligny center");
 		getContentPane().add(lblConta, "cell 0 4,alignx left,aligny top");
 		getContentPane().add(comboConta, "cell 0 5 3 1,growx");
@@ -135,9 +138,11 @@ public class AdicionaReceitaView extends JInternalFrame {
 		this.checkPago.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent e) {
 				if (checkPago.isSelected()) {
-					fieldDataPagamento.setEnabled(true);
-				} else
-					fieldDataPagamento.setEnabled(false);
+					pickerPagamento.setButtonEnable(true);
+				} else{
+					pickerPagamento.setButtonEnable(false);
+					pickerPagamento.clearDate();
+				}
 			}
 		});
 
@@ -216,9 +221,7 @@ public class AdicionaReceitaView extends JInternalFrame {
 	// FIELD
 	private JTextField fieldDescricao;
 	private JTextField fieldValor;
-	private JTextField fieldDataVencimento;
 	private JTextField fieldRepetir;
-	private JTextField fieldDataPagamento;
 
 	// CHECK
 	private JCheckBox checkPago;
@@ -240,8 +243,12 @@ public class AdicionaReceitaView extends JInternalFrame {
 	private String title;
 	private int type;
 	
-	private JDatePickerImpl datePicker;
-	private UtilDateModel model;
-	private JDatePanelImpl datePanel;
+	// DATE PICKER
+	private JDatePickerImpl pickerValidade;
+	private JDatePickerImpl pickerPagamento;
+	private UtilDateModel modelValidade;
+	private UtilDateModel modelPagamento;
+	private JDatePanelImpl panelValidade;
+	private JDatePanelImpl panelPagamento;
 	private Properties p;
 }

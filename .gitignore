@@ -6,7 +6,6 @@
 *.exe
 *.o
 *.so
-*.classpath
 
 src/META-INF/
  

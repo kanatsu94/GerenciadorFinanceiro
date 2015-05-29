@@ -150,11 +150,11 @@ public class PrincipalView extends javax.swing.JFrame {
 
 		btnRelatorios = new JButton(RELATORIOS_BTN_MENU);
 		menuBar.add(btnRelatorios);
-		
+
 		lblCarregando.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCarregando.setForeground(Color.WHITE);
 		lblCarregando.setFont(new Font("Arial", Font.BOLD, 26));
-
+		
 		GroupLayout groupLayout = new GroupLayout(telaPrincipal);
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -184,6 +184,15 @@ public class PrincipalView extends javax.swing.JFrame {
 
 		setSize(new java.awt.Dimension(800, 600));
 		setLocationRelativeTo(null);
+	}
+	
+	private void enableButtons(boolean flag){
+		btnReceita.setEnabled(flag);
+		btnDespesa.setEnabled(flag);
+		btnCategoria.setEnabled(flag);
+		btnCartaoCredito.setEnabled(flag);
+		btnConta.setEnabled(flag);
+		btnRelatorios.setEnabled(flag);
 	}
 
 	private void despesaView(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_itemEstoqueProdutoActionPerformed
