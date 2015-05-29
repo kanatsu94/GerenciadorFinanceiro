@@ -1,29 +1,27 @@
 package view;
 
 import java.awt.Dimension;
-import java.awt.Label;
-import java.awt.TextField;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyVetoException;
-import java.util.Vector;
+import java.util.Properties;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JTextField;
-import javax.swing.JLabel;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JCheckBox;
-import javax.swing.JToggleButton;
 
 import net.miginfocom.swing.MigLayout;
+
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
+
+import util.DateLabelFormatter;
 
 public class AdicionaReceitaView extends JInternalFrame {
 	/**
@@ -41,6 +39,15 @@ public class AdicionaReceitaView extends JInternalFrame {
 		setClosable(true);
 		setIconifiable(true);
 		setVisible(true);
+		
+		this.p = new Properties();
+		this.p.put("text.today", "Hoje");
+		this.p.put("text.month", "Mês");
+		this.p.put("text.year", "Ano");
+		
+		this.model = new UtilDateModel();
+		this.datePanel = new JDatePanelImpl(this.model, this.p);
+		this.datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
 
 		this.lblDescricao = new JLabel(LBL_DESCRICAO);
 		this.lblValor = new JLabel(LBL_VALOR);
@@ -90,7 +97,7 @@ public class AdicionaReceitaView extends JInternalFrame {
 		getContentPane().add(lblDescricao, "cell 0 0,alignx left,aligny top");
 		getContentPane().add(lblValor, "cell 0 2,alignx left,aligny top");
 		getContentPane().add(fieldValor, "cell 0 3,alignx left,aligny center");
-		getContentPane().add(fieldDataVencimento,
+		getContentPane().add(datePicker,
 				"cell 2 3,growx,aligny center");
 		getContentPane().add(lblDataVencimento, "cell 2 2,growx,aligny top");
 		getContentPane().add(lblReceitaFixa,
@@ -232,4 +239,9 @@ public class AdicionaReceitaView extends JInternalFrame {
 	private String msg;
 	private String title;
 	private int type;
+	
+	private JDatePickerImpl datePicker;
+	private UtilDateModel model;
+	private JDatePanelImpl datePanel;
+	private Properties p;
 }
