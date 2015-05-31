@@ -31,7 +31,7 @@ import dao.DespesaReceitaDAO;
 		@NamedQuery(name=DespesaReceita.REMOVER_POR_PARCELA_ID, query="DELETE FROM DespesaReceita d WHERE d.parcelaId = :parcela_id AND d.dataMovimentacao = null"),
 		@NamedQuery(name=DespesaReceita.LISTAR_POR_PARCELA_ID, query="SELECT d FROM DespesaReceita d WHERE d.parcelaId = :parcela_id AND d.dataMovimentacao = null")
 })
-public class DespesaReceita implements Serializable {
+public class DespesaReceita implements Serializable, Comparable<DespesaReceita> {
 	private static final long serialVersionUID = 1L;
 
 	@Transient
@@ -186,4 +186,22 @@ public class DespesaReceita implements Serializable {
 		this.dataVencimento = this.dataVencimento.withDayOfMonth(dataVencimento);
 		dao.atualizar(this);
 	}
+	
+	@Override
+	public String toString(){
+		return this.descricao;
+	}
+	
+	@Override
+	public int compareTo(DespesaReceita outra) {
+	    if (this.dataVencimento.isBefore(outra.dataVencimento)) {
+	      return -1;
+	    }
+
+	    if (this.dataVencimento.isAfter(outra.dataVencimento)) {
+	      return 1;
+	    }
+
+	    return 0;
+	  }
 }

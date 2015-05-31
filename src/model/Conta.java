@@ -82,5 +82,36 @@ public class Conta implements Serializable {
 
 		return despesaReceita;
 	}
+	
+	// NAO ALTERAR ESTE METODO.
+	// ELE ESTA SENDO USADO PARA MOSTRAR OS NOMES
+	// DOS ITENS NO JCOMBOBOX
+	@Override
+	public String toString(){
+		return this.descricao;
+	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Conta other = (Conta) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+	
+	
 }

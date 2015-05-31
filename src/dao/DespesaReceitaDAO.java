@@ -13,6 +13,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.LocalDate;
 
 @SuppressWarnings({ "unchecked"})
 public class DespesaReceitaDAO extends GenericDAO<DespesaReceita> implements
@@ -55,15 +56,14 @@ public class DespesaReceitaDAO extends GenericDAO<DespesaReceita> implements
 
 			Query q = em.createNamedQuery(DespesaReceita.LISTAR_POR_PARCELA_ID);
 			q.setParameter("parcela_id", dr.getParcelaId());
-			
-			// O METODO EXECUTEUPDATE() RETORNA A QUANTIDADE DE LINHAS AFETADAS
-			// NO BANCO DE DADOS.
+
 			List<DespesaReceita> lista = q.getResultList();
 			for(DespesaReceita d : lista){
 				d.setDescricao(dr.getDescricao());
 				d.setValor(dr.getValor());
 				d.setFixa(dr.getFixa());
 				d.setCategoriaBean(dr.getCategoriaBean());
+				d.setDataMovimentacao(dr.getDataMovimentacao());
 				d.setContaBean(dr.getContaBean());
 				
 				em.merge(d);
@@ -103,13 +103,16 @@ public class DespesaReceitaDAO extends GenericDAO<DespesaReceita> implements
 		Session session = em.unwrap(Session.class);
 		Criteria criteria = session.createCriteria(DespesaReceita.class);
 
-		// POR ENQUANTO, SOMENTE FARA CONSULTAS POR DESCRICAO!
 		if (dr.getDescricao() != null)
 			criteria.add(Restrictions.ilike("descricao", dr.getDescricao(),
 					MatchMode.ANYWHERE));
 		if (dr.getTipoBean() != null)
 			criteria.add(Restrictions.eq("tipoBean", dr.getTipoBean()));
-
+		if (dr.getDataMovimentacao() != null && dr.getDataMovimentacao().isEqual(new LocalDate()))
+			criteria.add(Restrictions.isNotNull("dataMovimentacao"));
+		else if(dr.getDataMovimentacao() != null && dr.getDataMovimentacao().isBefore(new LocalDate()))
+			criteria.add(Restrictions.isNull("dataMovimentacao"));
+		
 		List<DespesaReceita> results = criteria.list();
 
 		closeEm();
