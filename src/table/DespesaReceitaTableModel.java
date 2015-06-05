@@ -19,7 +19,7 @@ public class DespesaReceitaTableModel extends AbstractTableModel {
 	// ARRAY DE STRINGS COM O NOME DAS COLUNAS.
 	private String[] colunas = new String[] { "Cod.", "Descrição", "Valor",
 			"Categoria", "Vencimento", "Pago" };
-
+	
 	// CRIA UM DESPESARECEITATABLEMODEL VAZIO.
 	public DespesaReceitaTableModel() {
 		linhas = new ArrayList<DespesaReceita>();

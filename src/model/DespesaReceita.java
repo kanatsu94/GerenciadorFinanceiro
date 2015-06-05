@@ -204,4 +204,43 @@ public class DespesaReceita implements Serializable, Comparable<DespesaReceita> 
 
 	    return 0;
 	  }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((dataVencimento == null) ? 0 : dataVencimento.hashCode());
+		result = prime * result
+				+ ((descricao == null) ? 0 : descricao.hashCode());
+		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DespesaReceita other = (DespesaReceita) obj;
+		if (dataVencimento == null) {
+			if (other.dataVencimento != null)
+				return false;
+		} else if (!dataVencimento.equals(other.dataVencimento))
+			return false;
+		if (descricao == null) {
+			if (other.descricao != null)
+				return false;
+		} else if (!descricao.equals(other.descricao))
+			return false;
+		if (valor == null) {
+			if (other.valor != null)
+				return false;
+		} else if (!valor.equals(other.valor))
+			return false;
+		return true;
+	}
 }

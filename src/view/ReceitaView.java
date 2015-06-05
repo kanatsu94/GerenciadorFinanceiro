@@ -22,6 +22,16 @@ import javax.swing.table.TableColumnModel;
 
 import controller.DespesaReceitaController;
 
+import javax.swing.JLabel;
+
+import java.awt.Font;
+
+import javax.swing.JMenuBar;
+
+import org.joda.time.LocalDate;
+
+import util.NumberFieldDocument;
+
 public class ReceitaView extends JInternalFrame {
 	/*
 	 *
@@ -29,6 +39,28 @@ public class ReceitaView extends JInternalFrame {
 	private static final long serialVersionUID = 1L;
 
 	public ReceitaView() {
+		controllerDespesaReceita = new DespesaReceitaController();
+		this.vetorPago = new Vector<String>();
+		
+		this.vetorPago.addElement("Pago e Não Pago");
+		this.vetorPago.addElement("Não Pago");
+		this.vetorPago.addElement("Pago");
+		
+		this.vetorMes = new Vector<String>();
+
+		this.vetorMes.addElement("Jan");
+		this.vetorMes.addElement("Fev");
+		this.vetorMes.addElement("Mar");
+		this.vetorMes.addElement("Abr");
+		this.vetorMes.addElement("Mai");
+		this.vetorMes.addElement("Jun");
+		this.vetorMes.addElement("Jul");
+		this.vetorMes.addElement("Ago");
+		this.vetorMes.addElement("Set");
+		this.vetorMes.addElement("Out");
+		this.vetorMes.addElement("Nov");
+		this.vetorMes.addElement("Dez");
+
 		initComponents();
 	}
 
@@ -39,40 +71,9 @@ public class ReceitaView extends JInternalFrame {
 		setClosable(true);
 		setIconifiable(true);
 
-		controllerDespesaReceita = new DespesaReceitaController();
-
-		JButton btnAdicionarReceita = new JButton(BTN_ADICIONAR);
-		btnAdicionarReceita
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent evt) {
-						addReceitaView(evt);
-					}
-				});
-		btnAdicionarReceita.setBounds(20, 42, 89, 23);
-
-		JButton btnEditarReceita = new JButton(BTN_EDITAR);
-		btnEditarReceita.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				editReceitaView(evt);
-			}
-		});
-		btnEditarReceita.setBounds(121, 42, 89, 23);
-
-		vector.addElement("Pago e Não Pago");
-		vector.addElement("Não Pago");
-		vector.addElement("Pago");
-
-		comboFiltro = new JComboBox(vector);
-		comboFiltro.setBounds(20, 11, 190, 20);
-
-		btnRemoverReceita = new JButton(BTN_REMOVER);
-		btnRemoverReceita
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent evt) {
-						removerAction(evt);
-					}
-				});
-		btnRemoverReceita.setBounds(20, 437, 89, 23);
+		comboSituacao = new JComboBox(vetorPago);
+		comboSituacao.setBounds(20, 11, 190, 20);
+		comboSituacao.setToolTipText(DICA_COMBO_SITUACAO);
 
 		fieldBusca = new JTextField();
 		fieldBusca.setToolTipText(DICA_FIELD_BUSCAR);
@@ -84,13 +85,12 @@ public class ReceitaView extends JInternalFrame {
 			}
 		});
 
+
 		scrollPaneTabela = new JScrollPane();
 
 		table = new JTable();
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.setRowHeight(30);
-
-		carregaTabela();
 
 		btnBuscar = new JButton(BTN_BUSCAR);
 		btnBuscar.addActionListener(new java.awt.event.ActionListener() {
@@ -98,6 +98,51 @@ public class ReceitaView extends JInternalFrame {
 				buscarAction(evt);
 			}
 		});
+
+		lblTotal = new JLabel(LBL_TOTAL);
+		lblTotal.setFont(new Font("Tahoma", Font.PLAIN, 12));
+
+		comboMes = new JComboBox(vetorMes);
+		comboMes.setToolTipText(DICA_COMBO_MES);
+		comboMes.setSelectedIndex(new LocalDate().getMonthOfYear() - 1);
+
+		fieldAno = new JTextField();
+		fieldAno.setDocument(new NumberFieldDocument());
+		fieldAno.setColumns(10);
+		fieldAno.setToolTipText(DICA_FIELD_ANO);
+		fieldAno.setText("" +new LocalDate().getYear());
+
+		menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+
+		JButton btnAdicionarReceita = new JButton(BTN_ADICIONAR);
+		menuBar.add(btnAdicionarReceita);
+		btnAdicionarReceita
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
+						addReceitaView(evt);
+					}
+				});
+		btnAdicionarReceita.setBounds(20, 42, 89, 23);
+
+		JButton btnEditarReceita = new JButton(BTN_EDITAR);
+		menuBar.add(btnEditarReceita);
+		btnEditarReceita.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				editReceitaView(evt);
+			}
+		});
+		btnEditarReceita.setBounds(121, 42, 89, 23);
+
+		btnRemoverReceita = new JButton(BTN_REMOVER);
+		menuBar.add(btnRemoverReceita);
+		btnRemoverReceita
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
+						removerAction(evt);
+					}
+				});
+		btnRemoverReceita.setBounds(20, 437, 89, 23);
 
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout
@@ -115,40 +160,42 @@ public class ReceitaView extends JInternalFrame {
 																scrollPaneTabela,
 																Alignment.LEADING,
 																GroupLayout.DEFAULT_SIZE,
-																660,
+																664,
 																Short.MAX_VALUE)
+														.addComponent(lblTotal)
 														.addGroup(
 																groupLayout
 																		.createSequentialGroup()
 																		.addComponent(
-																				btnAdicionarReceita)
+																				fieldAno,
+																				GroupLayout.PREFERRED_SIZE,
+																				58,
+																				GroupLayout.PREFERRED_SIZE)
 																		.addPreferredGap(
 																				ComponentPlacement.RELATED)
 																		.addComponent(
-																				btnEditarReceita)
+																				comboMes,
+																				GroupLayout.PREFERRED_SIZE,
+																				67,
+																				GroupLayout.PREFERRED_SIZE)
 																		.addPreferredGap(
-																				ComponentPlacement.RELATED,
-																				76,
-																				Short.MAX_VALUE)
+																				ComponentPlacement.UNRELATED)
 																		.addComponent(
-																				comboFiltro,
+																				comboSituacao,
 																				GroupLayout.PREFERRED_SIZE,
 																				141,
 																				GroupLayout.PREFERRED_SIZE)
 																		.addPreferredGap(
-																				ComponentPlacement.RELATED)
+																				ComponentPlacement.UNRELATED)
 																		.addComponent(
 																				fieldBusca,
-																				GroupLayout.PREFERRED_SIZE,
-																				201,
-																				GroupLayout.PREFERRED_SIZE)
+																				GroupLayout.DEFAULT_SIZE,
+																				301,
+																				Short.MAX_VALUE)
 																		.addPreferredGap(
 																				ComponentPlacement.RELATED)
 																		.addComponent(
-																				btnBuscar))
-														.addComponent(
-																btnRemoverReceita,
-																Alignment.LEADING))
+																				btnBuscar)))
 										.addContainerGap()));
 		groupLayout
 				.setVerticalGroup(groupLayout
@@ -162,50 +209,49 @@ public class ReceitaView extends JInternalFrame {
 														.createParallelGroup(
 																Alignment.BASELINE)
 														.addComponent(
-																fieldBusca,
-																GroupLayout.PREFERRED_SIZE,
-																31,
-																GroupLayout.PREFERRED_SIZE)
-														.addComponent(
 																btnBuscar,
-																GroupLayout.PREFERRED_SIZE,
-																31,
-																GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																btnAdicionarReceita,
 																GroupLayout.DEFAULT_SIZE,
-																28,
+																31,
 																Short.MAX_VALUE)
 														.addComponent(
-																btnEditarReceita,
+																fieldBusca,
+																GroupLayout.DEFAULT_SIZE,
+																31,
+																Short.MAX_VALUE)
+														.addComponent(
+																fieldAno,
 																GroupLayout.PREFERRED_SIZE,
-																28,
+																29,
 																GroupLayout.PREFERRED_SIZE)
 														.addComponent(
-																comboFiltro,
+																comboMes,
+																GroupLayout.PREFERRED_SIZE,
+																29,
+																GroupLayout.PREFERRED_SIZE)
+														.addComponent(
+																comboSituacao,
 																GroupLayout.PREFERRED_SIZE,
 																29,
 																GroupLayout.PREFERRED_SIZE))
 										.addPreferredGap(
 												ComponentPlacement.UNRELATED)
 										.addComponent(scrollPaneTabela,
-												GroupLayout.DEFAULT_SIZE, 364,
-												Short.MAX_VALUE)
-										.addPreferredGap(
-												ComponentPlacement.UNRELATED)
-										.addComponent(btnRemoverReceita,
-												GroupLayout.PREFERRED_SIZE, 28,
-												GroupLayout.PREFERRED_SIZE)
-										.addGap(8)));
+												GroupLayout.DEFAULT_SIZE, 363,
+												Short.MAX_VALUE).addGap(18)
+										.addComponent(lblTotal)
+										.addContainerGap()));
 
 		scrollPaneTabela.setViewportView(table);
 		getContentPane().setLayout(groupLayout);
 		addReceitaView = null;
 		editReceitaView = null;
+
+		this.carregaTabela(comboMes.getSelectedIndex() + 1, fieldAno.getText());
 	}
 
-	private void carregaTabela() {
-		this.table.setModel(controllerDespesaReceita.getReceitaTableModel());
+	private void carregaTabela(int mes, String ano) {
+		this.table.setModel(controllerDespesaReceita.getReceitaTableModel(mes, Integer.parseInt(ano)));
+		this.lblTotal.setText(controllerDespesaReceita.getTotalReceita());
 		setColumnWidth();
 	}
 
@@ -222,7 +268,9 @@ public class ReceitaView extends JInternalFrame {
 
 	private void buscarAction(java.awt.event.ActionEvent evt) {
 		this.table.setModel(controllerDespesaReceita.buscar(
-				comboFiltro.getSelectedIndex(), fieldBusca.getText(), 2));
+				comboSituacao.getSelectedIndex(), fieldBusca.getText(), 2, comboMes.getSelectedIndex() + 1, Integer.parseInt(fieldAno.getText())));
+		this.lblTotal.setText(controllerDespesaReceita.getTotalReceita());
+		setColumnWidth();
 	}
 
 	private void removerAction(java.awt.event.ActionEvent evt) {
@@ -235,7 +283,7 @@ public class ReceitaView extends JInternalFrame {
 					table.getSelectedRow(), 0));
 
 		if (flag)
-			carregaTabela();
+			carregaTabela(comboMes.getSelectedIndex() + 1, fieldAno.getText());
 	}
 
 	private void addReceitaView(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_itemEstoqueProdutoActionPerformed
@@ -251,7 +299,7 @@ public class ReceitaView extends JInternalFrame {
 					.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
 						public void internalFrameClosing(InternalFrameEvent e) {
 							addReceitaView = null;
-							carregaTabela();
+							carregaTabela(comboMes.getSelectedIndex() + 1, fieldAno.getText());
 						}
 					});
 
@@ -290,15 +338,14 @@ public class ReceitaView extends JInternalFrame {
 							public void internalFrameClosing(
 									InternalFrameEvent e) {
 								editReceitaView = null;
-								carregaTabela();
+								carregaTabela(comboMes.getSelectedIndex() + 1, fieldAno.getText());
 							}
 						});
 
 				editReceitaView.setPosicao();
 				editReceitaView.setVisible(true);
 			}
-		}
-		else if(editReceitaView != null){
+		} else if (editReceitaView != null) {
 			showMessage(BTN_EDITAR, ATENCAO_EDITAR, 2);
 		}
 
@@ -329,7 +376,11 @@ public class ReceitaView extends JInternalFrame {
 	private String BTN_ADICIONAR = "Adicionar";
 	private String BTN_REMOVER = "Remover";
 	private String BTN_BUSCAR = "Buscar";
+	private String LBL_TOTAL = "Total: R$";
 	private String DICA_FIELD_BUSCAR = "Digite a descrição da despesa.";
+	private String DICA_FIELD_ANO = "Digite o ano.";
+	private String DICA_COMBO_MES = "Selecione o mês.";
+	private String DICA_COMBO_SITUACAO = "Selecione a situação.";
 	private String ERRO_REMOVER = "Selecione uma receita para remover.";
 	private String ERRO_EDITAR = "Selecione uma receita para editar.";
 	private String ATENCAO_EDITAR = "Você já está editando uma receita.\nTermine a edição da receita atual para editar outra.";
@@ -337,16 +388,23 @@ public class ReceitaView extends JInternalFrame {
 	private JButton btnRemoverReceita;
 	private JScrollPane scrollPaneTabela;
 	@SuppressWarnings("rawtypes")
-	private JComboBox comboFiltro;
-	private Vector<String> vector = new Vector<String>();
+	private JComboBox comboSituacao;
+	private Vector<String> vetorPago;
+	private Vector<String> vetorMes;
 	private TableColumnModel columnModel;
 
 	private JTextField fieldBusca;
 	private JButton btnBuscar;
 	private JTable table;
 
+	private JLabel lblTotal;
+
 	private AdicionaReceitaView addReceitaView;
 	private EditarReceitaView editReceitaView;
 
 	protected static DespesaReceitaController controllerDespesaReceita;
+	private JMenuBar menuBar;
+	@SuppressWarnings("rawtypes")
+	private JComboBox comboMes;
+	private JTextField fieldAno;
 }

@@ -21,7 +21,6 @@ import net.miginfocom.swing.MigLayout;
 
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.UtilDateModel;
-import org.joda.time.LocalDate;
 
 import util.DateLabelFormatter;
 import util.DecimalFieldDocument;
@@ -155,12 +154,11 @@ public class AdicionaReceitaView extends JInternalFrame {
 				if (checkPago.isSelected()) {
 					pickerPagamento.setButtonEnable(true);
 				} else {
+					panelPagamento.getModel().setSelected(false);
 					pickerPagamento.setButtonEnable(false);
-					pickerPagamento.clearDate();
 				}
 			}
 		});
-
 	}
 
 	private void cancelarAction(java.awt.event.ActionEvent evt) {

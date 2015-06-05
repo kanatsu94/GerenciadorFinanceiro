@@ -15,9 +15,9 @@ import dao.DespesaReceitaDAO;
 import dao.ParcelaSeqDAO;
 
 public abstract class DespesaReceitaFactory {
-	private static String ERRO_DATA_VENCIMENTO = "- A data de vencimento é anterior a data atual.\n Se a data estiver correta, informe a data da movimentação.";
+//	private static String ERRO_DATA_VENCIMENTO = "- A data de vencimento é anterior a data atual.\n Se a data estiver correta, informe a data da movimentação.";
 	private static String ERRO_SALVAR = "Erro ao salvar ";
-	private static String ERRO_REPETIR = "- Não é possível repetir despesas/receitas com data de vencimento anterior a data atual.";
+//	private static String ERRO_REPETIR = "- Não é possível repetir despesas/receitas com data de vencimento anterior a data atual.";
 	private static String ERRO_VALOR = "- O valor deve ser maior do que zero.";
 
 	public static ArrayList<String> novaDespesaReceita(String descricao,
@@ -98,6 +98,9 @@ public abstract class DespesaReceitaFactory {
 				else {
 					dataVencimento = date_1.plusMonths(i);
 				}
+				
+				if(i > 0)
+					dataMovimentacao = null;
 
 				nova = new DespesaReceita(descricao, dataVencimento, valor);
 
@@ -131,16 +134,16 @@ public abstract class DespesaReceitaFactory {
 
 		ArrayList<String> erros = new ArrayList<>();
 
-		if (parcelas > 1 && dataVencimento.isBefore(LocalDate.now())) {
-			erros.add(ERRO_REPETIR);
-		}
+//		if (parcelas > 1 && dataVencimento.isBefore(LocalDate.now())) {
+//			erros.add(ERRO_REPETIR);
+//		}
 
 		// VERIFICA SE A DATA DE VENCIMENTO E ANTERIOR A DATA ATUAL.
-		else if (dataVencimento.isBefore(LocalDate.now())) {
-			// SE FOR, A DESPESA/RECEITA DEVE POSSUIR UMA DATA DE MOVIMENTACAO.
-			if (dataMovimentacao == null)
-				erros.add(ERRO_DATA_VENCIMENTO);
-		}
+//		else if (dataVencimento.isBefore(LocalDate.now())) {
+//			// SE FOR, A DESPESA/RECEITA DEVE POSSUIR UMA DATA DE MOVIMENTACAO.
+//			if (dataMovimentacao == null)
+//				erros.add(ERRO_DATA_VENCIMENTO);
+//		}
 		
 		if(valor <= 0){
 			erros.add(ERRO_VALOR);

@@ -1,5 +1,6 @@
 package controller;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -64,6 +65,10 @@ public class DespesaReceitaController {
 	private Tipo RECEITA;
 	private Tipo DESPESA;
 
+	private String totalReceita;
+	private String totalDespesa;
+	private DecimalFormat df;
+
 	public DespesaReceitaController() {
 		this.msg = "";
 		this.dao = new DespesaReceitaDAO();
@@ -77,6 +82,9 @@ public class DespesaReceitaController {
 		this.listaCategoriaDespesa = null;
 		this.RECEITA = daoTipo.procurar(2);
 		this.DESPESA = daoTipo.procurar(1);
+		this.totalDespesa = "";
+		this.totalReceita = "";
+		this.df = new DecimalFormat("0.##");
 	}
 
 	// RECUPERA TODOS OS REGISTROS DE DESPESA/RECEITA DO
@@ -102,47 +110,143 @@ public class DespesaReceitaController {
 		return lista;
 	}
 
-	@SuppressWarnings("deprecation")
-	public DespesaReceitaTableModel buscar(int pago, String descricao, int tipo) {
-		DespesaReceita dr = new DespesaReceita();
+	public DespesaReceitaTableModel buscar(int pago, String descricao,
+			int tipo, int mes, int ano) {
+		List<DespesaReceita> novaLista = new ArrayList<>();
+		descricao = descricao.toLowerCase();
 
-		dr.setDescricao(descricao);
+		if (tipo == 1) {
+			this.getDespesaTableModel(mes, ano);
+			novaLista.addAll(this.listaDespesa);
+			this.listaDespesa.clear();
 
-		if (tipo == 1)
-			dr.setTipoBean(DESPESA);
-		else
-			dr.setTipoBean(RECEITA);
+			for (DespesaReceita r : novaLista) {
+				// PAGO = 0 > TODOS OS REGISTROS, COM E SEM DATA DE
+				// MOVIMENTACAO.
+				// PAGO = 1 > SOMENTE REGISTROS SEM DATA DE MOVIMENTACAO.
+				// PAGO = 2 > SOMENTE REGISTROS COM DATA DE MOVIMENTACAO.
+				if (r.getDescricao().toLowerCase().contains(descricao)
+						&& pago == 0)
+					this.listaDespesa.add(r);
+				else if (r.getDescricao().toLowerCase().contains(descricao)
+						&& pago == 1 && r.getDataMovimentacao() == null)
+					this.listaDespesa.add(r);
+				else if (r.getDescricao().toLowerCase().contains(descricao)
+						&& pago == 2 && r.getDataMovimentacao() != null)
+					this.listaDespesa.add(r);
+			}
 
-		// DATA NULL = BUSCA REGISTROS COM E SEM DATA DE MOVIMENTACAO
-		// DATA ANTERIOR A ATUAL = BUSCA REGISTROS SEM DATA DE MOVIMENTACAO
-		// DATA ATUAL = BUSCA REGISTROS COM DATA DE MOVIMENTACAO
-		if (pago == 0)
-			dr.setDataMovimentacao(null);
-		else if (pago == 1)
-			dr.setDataMovimentacao(new LocalDate().minusDays(1));
-		else
-			dr.setDataMovimentacao(new LocalDate());
+			return new DespesaReceitaTableModel(this.listaDespesa);
+		} else {
+			this.getReceitaTableModel(mes, ano);
+			novaLista.addAll(this.listaReceita);
+			this.listaReceita.clear();
 
-		return new DespesaReceitaTableModel(dao.consultaDinamica(dr));
+			for (DespesaReceita r : novaLista) {
+				// PAGO = 0 > TODOS OS REGISTROS, COM E SEM DATA DE
+				// MOVIMENTACAO.
+				// PAGO = 1 > SOMENTE REGISTROS SEM DATA DE MOVIMENTACAO.
+				// PAGO = 2 > SOMENTE REGISTROS COM DATA DE MOVIMENTACAO.
+				if (r.getDescricao().toLowerCase().contains(descricao)
+						&& pago == 0)
+					this.listaReceita.add(r);
+				else if (r.getDescricao().toLowerCase().contains(descricao)
+						&& pago == 1 && r.getDataMovimentacao() == null)
+					this.listaReceita.add(r);
+				else if (r.getDescricao().toLowerCase().contains(descricao)
+						&& pago == 2 && r.getDataMovimentacao() != null)
+					this.listaReceita.add(r);
+			}
+
+			return new DespesaReceitaTableModel(this.listaReceita);
+		}
 	}
 
-	public DespesaReceitaTableModel getTableModel(Tipo t) {
-		return new DespesaReceitaTableModel(listarTudo(t));
+	public DespesaReceitaTableModel getReceitaTableModel(int mes, int ano) {
+		this.listaReceita = listarTudo(RECEITA);
+		List<DespesaReceita> novaLista = new ArrayList<>();
+		novaLista.addAll(this.listaReceita);
+		this.listaReceita.clear();
+
+		for (DespesaReceita r : novaLista) {
+			if (r.getDataVencimento().getMonthOfYear() == mes
+					&& r.getDataVencimento().getYear() == ano) {
+				this.listaReceita.add(r);
+			} else if ((r.getDataVencimento().getMonthOfYear() < mes && r.getDataVencimento().getYear() <= ano && r.getFixa()) || (r.getDataVencimento().getYear() < ano && r.getFixa())) {
+							DespesaReceita nova = new DespesaReceita(
+									r.getDescricao(),
+									r.getDataVencimento().withMonthOfYear(mes)
+											.withYear(ano), r.getValor());
+							
+							if (!novaLista.contains(nova) && !this.listaReceita.contains(nova)){
+								nova.setCartaoCreditoBean(null);
+								nova.setCategoriaBean(r.getCategoriaBean());
+								nova.setDataMovimentacao(null);
+								nova.setContaBean(r.getContaBean());
+								nova.setFixa(r.getFixa());
+								nova.setParcelaId(null);
+								nova.setTipoBean(RECEITA);
+								
+								this.listaReceita.add(nova);
+							}
+					}
+		}
+		Collections.sort(this.listaReceita);
+
+		Double pago = 0.0;
+		Double naoPago = 0.0;
+
+		for (DespesaReceita r : this.listaReceita) {
+			if (r.getDataMovimentacao() == null)
+				naoPago = naoPago + r.getValor();
+			else
+				pago = pago + r.getValor();
+		}
+
+		this.totalReceita = "Pago: R$" + df.format(pago) + " | Não pago: R$"
+				+ df.format(naoPago) + " | Total: R$"
+				+ df.format(pago + naoPago);
+
+		return new DespesaReceitaTableModel(this.listaReceita);
 	}
 
-	public DespesaReceitaTableModel getReceitaTableModel() {
-		List<DespesaReceita> lista = listarTudo(RECEITA);
-		Collections.sort(lista);
-
-		this.listaReceita = lista;
-
-		return new DespesaReceitaTableModel(lista);
-	}
-
-	public DespesaReceitaTableModel getDespesaTableModel() {
+	public DespesaReceitaTableModel getDespesaTableModel(int mes, int ano) {
 		this.listaDespesa = listarTudo(DESPESA);
+		List<DespesaReceita> novaLista = new ArrayList<>();
+		novaLista.addAll(this.listaDespesa);
+		this.listaDespesa.clear();
+
+		for (DespesaReceita d : novaLista) {
+			if (d.getDataVencimento().getMonthOfYear() == mes
+					&& d.getDataVencimento().getYear() == ano) {
+				this.listaDespesa.add(d);
+			}
+		}
+		Collections.sort(this.listaDespesa);
+
+		Double pago = 0.0;
+		Double naoPago = 0.0;
+
+		for (DespesaReceita d : this.listaDespesa) {
+			if (d.getDataMovimentacao() == null)
+				naoPago = naoPago + d.getValor();
+			else
+				pago = pago + d.getValor();
+		}
+
+		this.totalDespesa = "Pago: R$" + df.format(pago) + " | A pagar: R$"
+				+ df.format(naoPago) + " | Total: R$"
+				+ df.format(pago + naoPago);
 
 		return new DespesaReceitaTableModel(listaDespesa);
+	}
+
+	public String getTotalReceita() {
+		return this.totalReceita.toString();
+	}
+
+	public String getTotalDespesa() {
+		return this.totalDespesa.toString();
 	}
 
 	// SALVA UMA DESPESA/RECEITA
@@ -187,12 +291,11 @@ public class DespesaReceitaController {
 				this.type = 1;
 				this.msg = tipo.getDescricao() + SALVAR_SUCESSO;
 			}
+			
+			showMessage();
 		} else {
 			flag = false;
 		}
-
-		showMessage();
-
 		return flag;
 	}
 
@@ -226,6 +329,9 @@ public class DespesaReceitaController {
 				retorno = false;
 			}
 		}
+		
+		if(!retorno)
+			showMessage();
 
 		return retorno;
 	}
@@ -234,6 +340,7 @@ public class DespesaReceitaController {
 	public boolean remover(Object id) {
 		DespesaReceita dr = dao.procurar((int) id);
 		boolean flag = false;
+		int num = 1;
 
 		this.title = TITLE_REMOVER + dr.getTipoBean().getDescricao();
 		this.msg = REMOVER_CONFIRMACAO;
@@ -241,84 +348,44 @@ public class DespesaReceitaController {
 
 		if (showQuestionMessage() == 0) {
 			flag = true;
-			if (dr.getParcelaId() != null && dr.getDataMovimentacao() == null) {
-				this.title = TITLE_REMOVER + dr.getTipoBean().getDescricao();
-				this.msg = MSG_PARCELA;
 
-				// NESSE CASO, INDICA QUE TEREMOS SOMENTE A OPCAO DE RESPONDER
-				// SIM OU NAO NO CONFIRMDIALOG.
-				this.type = 0;
+			this.title = TITLE_REMOVER + dr.getTipoBean().getDescricao();
+			this.msg = MSG_PARCELA;
 
-				// CASO QUERIA REMOVER AS PARCELAS NAO PAGAS:
-				if (showQuestionMessage() == 0) {
-					int num = dao.removerPorParcelaId(dr.getParcelaId());
+			// NESSE CASO, INDICA QUE TEREMOS SOMENTE A OPCAO DE RESPONDER
+			// SIM OU NAO NO CONFIRMDIALOG.
+			this.type = 0;
 
-					// CASO TENHA REMOVIDO, O SISTEMA EXIBE UMA MENSAGEM DE
-					// SUCESSO
-					if (num > 0) {
-						this.msg = num + " "
-								+ dr.getTipoBean().getDescricao().toLowerCase()
-								+ REMOVER_SUCESSO;
-						this.title = TITLE_REMOVER;
-						this.type = 1;
-					}
-					// CASO ALGO TENHA DADO ERRADO, O SISTEMA EXIBE UMA MENSAGEM
-					// DE
-					// ERRO.
-					else {
-						this.msg = REMOVER_FALHA
-								+ dr.getTipoBean().getDescricao().toLowerCase()
-								+ ".";
-						this.title = TITLE_REMOVER;
-						this.type = 0;
-						flag = false;
-					}
-				} else {
+			if (dr.getParcelaId() != null && dr.getDataMovimentacao() == null
+					&& showQuestionMessage() == 0) {
 
-					// CASO TENHA REMOVIDO, O SISTEMA EXIBE UMA MENSAGEM DE
-					// SUCESSO
-					if (dao.remover(dr)) {
-						this.msg = dr.getTipoBean().getDescricao()
-								+ REMOVER_SUCESSO;
-						this.title = TITLE_REMOVER;
-						this.type = 1;
-					}
+				num = dao.removerPorParcelaId(dr.getParcelaId());
 
-					// CASO ALGO TENHA DADO ERRADO, O SISTEMA EXIBE UMA MENSAGEM
-					// DE
-					// ERRO.
-					else {
-						this.msg = REMOVER_FALHA
-								+ dr.getTipoBean().getDescricao().toLowerCase()
-								+ ".";
-						this.title = TITLE_REMOVER;
-						this.type = 0;
-						flag = false;
-					}
-				}
-			} else {
-
-				// CASO TENHA REMOVIDO, O SISTEMA EXIBE UMA MENSAGEM DE SUCESSO
-				if (dao.remover(dr)) {
-					this.msg = dr.getTipoBean().getDescricao()
-							+ REMOVER_SUCESSO;
-					this.title = TITLE_REMOVER;
-					this.type = 1;
-				}
-
-				// CASO ALGO TENHA DADO ERRADO, O SISTEMA EXIBE UMA MENSAGEM DE
-				// ERRO.
-				else {
-					this.msg = REMOVER_FALHA
-							+ dr.getTipoBean().getDescricao().toLowerCase()
-							+ ".";
-					this.title = TITLE_REMOVER;
-					this.type = 0;
+				// CASO TENHA REMOVIDO, O SISTEMA EXIBE UMA MENSAGEM DE
+				// SUCESSO
+				if (num <= 0) {
 					flag = false;
 				}
+			} else
+				// CASO TENHA REMOVIDO, O SISTEMA EXIBE UMA MENSAGEM DE SUCESSO
+				flag = dao.remover(dr);
+
+			if (flag) {
+				this.msg = num + " "
+						+ dr.getTipoBean().getDescricao().toLowerCase()
+						+ REMOVER_SUCESSO;
+				this.title = TITLE_REMOVER;
+				this.type = 1;
+			} else {
+				this.msg = REMOVER_FALHA
+						+ dr.getTipoBean().getDescricao().toLowerCase() + ".";
+				this.title = TITLE_REMOVER;
+				this.type = 0;
 			}
+
 			showMessage();
 		}
+
 		return flag;
 	}
 
@@ -326,107 +393,74 @@ public class DespesaReceitaController {
 	public boolean atualizar(String descricao, Date dataVencimento,
 			Date dataMovimentacao, String valor, boolean fixa,
 			Object categoria, Object conta, Object cartaoCredito, boolean pago,
-			int id) {
+			int id, int tipo) {
 		DespesaReceita dr;
 		this.type = 0;
 		boolean flag = true;
 
-		if (validaCampos(descricao, dataVencimento, dataMovimentacao, valor,
-				pago)) {
+		if (id == 0) {
+			salvar(descricao, dataVencimento, dataMovimentacao, valor, fixa,
+					categoria, tipo, conta, cartaoCredito, "1", pago);
+		}
+
+		else if (validaCampos(descricao, dataVencimento, dataMovimentacao,
+				valor, pago)) {
+
 			dr = dao.procurar(id);
-
-			LocalDate movimentacao = null;
-
-			if (dataMovimentacao != null && pago)
-				movimentacao = new LocalDate(dataMovimentacao);
 
 			dr.setDescricao(descricao);
 			dr.setDataVencimento(new LocalDate(dataVencimento));
-			dr.setDataMovimentacao(movimentacao);
 			dr.setValor(Double.parseDouble(valor.replace(",", ".")));
 			dr.setFixa(fixa);
 			dr.setCategoriaBean((Categoria) categoria);
 			dr.setContaBean((Conta) conta);
 			dr.setCartaoCreditoBean((CartaoCredito) cartaoCredito);
 
-			// VERIFICA SE EXISTEM PARCELAS DESTA DESPESA/RECEITA.
-			if (dr.getParcelaId() != null
-					&& dao.procurar(dr.getId()).getDataMovimentacao() == null) {
-				this.title = TITLE_ATUALIZAR + dr.getTipoBean().getDescricao();
-				this.msg = MSG_PARCELA;
+			LocalDate movimentacao;
 
-				// NESSE CASO, INDICA QUE TEREMOS SOMENTE A OPCAO DE RESPONDER
-				// SIM OU NAO NO CONFIRMDIALOG.
-				this.type = 0;
-
-				// CASO QUERIA ATUALIZAR AS PARCELAS NAO PAGAS:
-				if (showQuestionMessage() == 0) {
-					// CASO TENHA ATUALIZADO, O SISTEMA EXIBE UMA MENSAGEM DE
-					// SUCESSO
-					if (dao.atualizarPorParcelaId(dr)) {
-						this.msg = dr.getTipoBean().getDescricao()
-								+ ATUALIZAR_SUCESSO;
-						this.title = TITLE_ATUALIZAR;
-						this.type = 1;
-					}
-					// CASO ALGO TENHA DADO ERRADO, O SISTEMA EXIBE UMA MENSAGEM
-					// DE
-					// ERRO.
-					else {
-						this.msg = ATUALIZAR_FALHA
-								+ dr.getTipoBean().getDescricao().toLowerCase()
-								+ ".";
-						this.title = TITLE_ATUALIZAR;
-						this.type = 0;
-					}
-				} else {
-
-					// CASO TENHA ATUALIZADO, O SISTEMA EXIBE UMA MENSAGEM DE
-					// SUCESSO
-					if (dao.atualizar(dr)) {
-						this.msg = dr.getTipoBean().getDescricao()
-								+ ATUALIZAR_SUCESSO;
-						this.title = TITLE_ATUALIZAR;
-						this.type = 1;
-					}
-
-					// CASO ALGO TENHA DADO ERRADO, O SISTEMA EXIBE UMA MENSAGEM
-					// DE
-					// ERRO.
-					else {
-						this.msg = ATUALIZAR_SUCESSO
-								+ dr.getTipoBean().getDescricao().toLowerCase()
-								+ ".";
-						this.title = TITLE_ATUALIZAR;
-						this.type = 0;
-					}
-				}
+			if (dataMovimentacao != null && pago) {
+				movimentacao = new LocalDate(dataMovimentacao);
+				dr.setDataMovimentacao(movimentacao);
 			} else {
+				dr.setDataMovimentacao(null);
+			}
 
+			this.title = TITLE_ATUALIZAR + dr.getTipoBean().getDescricao();
+			this.msg = MSG_PARCELA;
+
+			// NESSE CASO, INDICA QUE TEREMOS SOMENTE A OPCAO DE RESPONDER
+			// SIM OU NAO NO CONFIRMDIALOG.
+			this.type = 0;
+
+			// VERIFICA SE EXISTEM PARCELAS DESTA DESPESA/RECEITA
+			// E CASO EXISTA, PERGUNTA SE QUER PROPAGAR A ALTERACAO.
+			if (dr.getParcelaId() != null
+					&& dao.procurar(dr.getId()).getDataMovimentacao() == null
+					&& showQuestionMessage() == 0)
+
+				flag = dao.atualizarPorParcelaId(dr);
+
+			else {
 				// CASO TENHA ATUALIZADO, O SISTEMA EXIBE UMA MENSAGEM DE
 				// SUCESSO
-				if (dao.atualizar(dr)) {
-					this.msg = dr.getTipoBean().getDescricao()
-							+ ATUALIZAR_SUCESSO;
-					this.title = TITLE_ATUALIZAR;
-					this.type = 1;
-				}
-
-				// CASO ALGO TENHA DADO ERRADO, O SISTEMA EXIBE UMA MENSAGEM DE
-				// ERRO.
-				else {
-					this.msg = ATUALIZAR_SUCESSO
-							+ dr.getTipoBean().getDescricao().toLowerCase()
-							+ ".";
-					this.title = TITLE_ATUALIZAR;
-					this.type = 0;
-				}
+				flag = dao.atualizar(dr);
 			}
+
+			if (flag) {
+				this.msg = dr.getTipoBean().getDescricao() + ATUALIZAR_SUCESSO;
+				this.title = TITLE_ATUALIZAR;
+				this.type = 1;
+			} else {
+				this.msg = ATUALIZAR_FALHA
+						+ dr.getTipoBean().getDescricao().toLowerCase() + ".";
+				this.title = TITLE_ATUALIZAR;
+				this.type = 0;
+			}
+			
+			showMessage();
 		} else {
 			flag = false;
 		}
-
-		showMessage();
 		return flag;
 	}
 

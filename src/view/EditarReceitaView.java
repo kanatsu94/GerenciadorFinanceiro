@@ -27,9 +27,6 @@ import util.DecimalFieldDocument;
 import util.JDatePickerImpl;
 import util.TextFieldDocument;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class EditarReceitaView extends JInternalFrame {
 	/**
@@ -47,6 +44,9 @@ public class EditarReceitaView extends JInternalFrame {
 		setClosable(true);
 		setIconifiable(true);
 		setVisible(true);
+		
+		// ID DO TIPO
+		this.RECEITA = 2;
 		
 		this.p = new Properties();
 		this.p.put("text.today", "Hoje");
@@ -130,8 +130,8 @@ public class EditarReceitaView extends JInternalFrame {
 						if (checkPago.isSelected()) {
 							pickerPagamento.setButtonEnable(true);
 						} else{
+							panelPagamento.getModel().setSelected(false);
 							pickerPagamento.setButtonEnable(false);
-							pickerPagamento.clearDate();
 						}
 					}
 				});
@@ -168,7 +168,8 @@ public class EditarReceitaView extends JInternalFrame {
 				this.comboConta.getSelectedItem(),
 				null,
 				this.checkPago.isSelected(),
-				Integer.parseInt(this.fieldCod.getText())
+				Integer.parseInt(this.fieldCod.getText()),
+				RECEITA
 				);
 		if(flag)
 			closeThisFrame();
@@ -294,6 +295,7 @@ public class EditarReceitaView extends JInternalFrame {
 	private String msg;
 	private String title;
 	private int type;
+	private int RECEITA;
 	
 	// DATE PICKER
 	private JDatePickerImpl pickerVencimento;

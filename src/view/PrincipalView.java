@@ -1,7 +1,8 @@
 package view;
 
-import java.awt.Dimension;
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
@@ -10,14 +11,12 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
+import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
 
 import controller.MainController;
-import javax.swing.JLabel;
-import java.awt.Font;
-import java.awt.Color;
-import javax.swing.SwingConstants;
 
 public class PrincipalView extends javax.swing.JFrame {
 
@@ -184,15 +183,6 @@ public class PrincipalView extends javax.swing.JFrame {
 
 		setSize(new java.awt.Dimension(800, 600));
 		setLocationRelativeTo(null);
-	}
-	
-	private void enableButtons(boolean flag){
-		btnReceita.setEnabled(flag);
-		btnDespesa.setEnabled(flag);
-		btnCategoria.setEnabled(flag);
-		btnCartaoCredito.setEnabled(flag);
-		btnConta.setEnabled(flag);
-		btnRelatorios.setEnabled(flag);
 	}
 
 	private void despesaView(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_itemEstoqueProdutoActionPerformed

@@ -263,7 +263,6 @@ public class JDatePickerImpl extends JPanel implements JDatePicker {
 				datePanel.getModel().setSelected(true);
 			}
 		}
-		
 	}
 
 	public boolean isDoubleClickAction() {
@@ -296,9 +295,5 @@ public class JDatePickerImpl extends JPanel implements JDatePicker {
 	
 	public void setButtonEnable(boolean flag){
 		this.button.setEnabled(flag);
-	}
-	
-	public void clearDate(){
-		this.setTextFieldValue(formattedTextField, 0, 0, 0, false);
 	}
 }
