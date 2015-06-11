@@ -13,7 +13,6 @@ import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
@@ -24,6 +23,7 @@ import org.jdatepicker.impl.UtilDateModel;
 
 import util.DateLabelFormatter;
 import util.DecimalFieldDocument;
+import util.ExibeMensagem;
 import util.JDatePickerImpl;
 import util.NumberFieldDocument;
 import util.TextFieldDocument;
@@ -195,16 +195,7 @@ public class AdicionaReceitaView extends JInternalFrame {
 		// OPCOES SIM E NAO.
 		this.type = 0;
 
-		return showQuestionMessage();
-	}
-
-	private int showQuestionMessage() {
-
-		// 0 = SIM
-		// 1 = NAO
-		// 2 = CANCELAR
-		return JOptionPane.showConfirmDialog(null, this.msg, this.title,
-				this.type);
+		return ExibeMensagem.showQuestionMessage(this.msg, this.title, this.type);
 	}
 
 	private void closeThisFrame() {

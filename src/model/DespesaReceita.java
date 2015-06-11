@@ -187,6 +187,15 @@ public class DespesaReceita implements Serializable, Comparable<DespesaReceita> 
 		dao.atualizar(this);
 	}
 	
+	// UTILIZA O EQUALS PARA VERIFICAR SE E IGUAL,
+	// DEPOIS COMPARA AS DATAS DE VENCIMENTO.
+	public boolean equalsDateVencimento(Object obj){
+		if(this.equals(obj)){
+			return ((DespesaReceita)obj).getDataVencimento().equals(this.getDataVencimento());
+		}
+		return false;
+	}
+	
 	@Override
 	public String toString(){
 		return this.descricao;
@@ -210,9 +219,12 @@ public class DespesaReceita implements Serializable, Comparable<DespesaReceita> 
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((dataVencimento == null) ? 0 : dataVencimento.hashCode());
+				+ ((categoriaBean == null) ? 0 : categoriaBean.hashCode());
+		result = prime * result
+				+ ((contaBean == null) ? 0 : contaBean.hashCode());
 		result = prime * result
 				+ ((descricao == null) ? 0 : descricao.hashCode());
+		result = prime * result + (fixa ? 1231 : 1237);
 		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
 		return result;
 	}
@@ -226,15 +238,22 @@ public class DespesaReceita implements Serializable, Comparable<DespesaReceita> 
 		if (getClass() != obj.getClass())
 			return false;
 		DespesaReceita other = (DespesaReceita) obj;
-		if (dataVencimento == null) {
-			if (other.dataVencimento != null)
+		if (categoriaBean == null) {
+			if (other.categoriaBean != null)
 				return false;
-		} else if (!dataVencimento.equals(other.dataVencimento))
+		} else if (!categoriaBean.equals(other.categoriaBean))
+			return false;
+		if (contaBean == null) {
+			if (other.contaBean != null)
+				return false;
+		} else if (!contaBean.equals(other.contaBean))
 			return false;
 		if (descricao == null) {
 			if (other.descricao != null)
 				return false;
 		} else if (!descricao.equals(other.descricao))
+			return false;
+		if (fixa != other.fixa)
 			return false;
 		if (valor == null) {
 			if (other.valor != null)
@@ -243,4 +262,5 @@ public class DespesaReceita implements Serializable, Comparable<DespesaReceita> 
 			return false;
 		return true;
 	}
+
 }

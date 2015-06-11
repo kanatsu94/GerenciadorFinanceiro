@@ -1,6 +1,7 @@
 package view;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
@@ -11,7 +12,8 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
+import javax.swing.JLabel;
+import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -20,17 +22,11 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.table.TableColumnModel;
 
-import controller.DespesaReceitaController;
-
-import javax.swing.JLabel;
-
-import java.awt.Font;
-
-import javax.swing.JMenuBar;
-
 import org.joda.time.LocalDate;
 
+import util.ExibeMensagem;
 import util.NumberFieldDocument;
+import controller.DespesaReceitaController;
 
 public class ReceitaView extends JInternalFrame {
 	/*
@@ -60,6 +56,8 @@ public class ReceitaView extends JInternalFrame {
 		this.vetorMes.addElement("Out");
 		this.vetorMes.addElement("Nov");
 		this.vetorMes.addElement("Dez");
+		
+		this.RECEITA = 2;
 
 		initComponents();
 	}
@@ -115,7 +113,7 @@ public class ReceitaView extends JInternalFrame {
 		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
-		JButton btnAdicionarReceita = new JButton(BTN_ADICIONAR);
+		this.btnAdicionarReceita = new JButton(BTN_ADICIONAR);
 		menuBar.add(btnAdicionarReceita);
 		btnAdicionarReceita
 				.addActionListener(new java.awt.event.ActionListener() {
@@ -125,7 +123,7 @@ public class ReceitaView extends JInternalFrame {
 				});
 		btnAdicionarReceita.setBounds(20, 42, 89, 23);
 
-		JButton btnEditarReceita = new JButton(BTN_EDITAR);
+		this.btnEditarReceita = new JButton(BTN_EDITAR);
 		menuBar.add(btnEditarReceita);
 		btnEditarReceita.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -277,10 +275,10 @@ public class ReceitaView extends JInternalFrame {
 		boolean flag = false;
 
 		if (table.getSelectedRow() == -1)
-			showMessage(BTN_REMOVER, ERRO_REMOVER, 0);
+			ExibeMensagem.showMessage(ERRO_REMOVER, BTN_REMOVER, 0);
 		else
 			flag = controllerDespesaReceita.remover(table.getValueAt(
-					table.getSelectedRow(), 0));
+					table.getSelectedRow(), 0), RECEITA);
 
 		if (flag)
 			carregaTabela(comboMes.getSelectedIndex() + 1, fieldAno.getText());
@@ -321,7 +319,7 @@ public class ReceitaView extends JInternalFrame {
 		if (editReceitaView == null) {
 
 			if (table.getSelectedRow() == -1)
-				showMessage(BTN_BUSCAR, ERRO_EDITAR, 0);
+				ExibeMensagem.showMessage(ERRO_EDITAR, BTN_EDITAR, 0);
 
 			else {
 				editReceitaView = controllerDespesaReceita
@@ -346,7 +344,7 @@ public class ReceitaView extends JInternalFrame {
 				editReceitaView.setVisible(true);
 			}
 		} else if (editReceitaView != null) {
-			showMessage(BTN_EDITAR, ATENCAO_EDITAR, 2);
+			ExibeMensagem.showMessage(ATENCAO_EDITAR, BTN_EDITAR, 2);
 		}
 
 		// TRAZ A TELA DE ADICIONAR RECEITA PARA FRENTE
@@ -361,10 +359,6 @@ public class ReceitaView extends JInternalFrame {
 		}
 	}
 
-	public void showMessage(String title, String msg, int type) {
-		JOptionPane.showMessageDialog(null, msg, title, type);
-	}
-
 	public void setPosicao() {
 		Dimension d = this.getDesktopPane().getSize();
 		this.setLocation((d.width - this.getSize().width) / 2,
@@ -377,7 +371,7 @@ public class ReceitaView extends JInternalFrame {
 	private String BTN_REMOVER = "Remover";
 	private String BTN_BUSCAR = "Buscar";
 	private String LBL_TOTAL = "Total: R$";
-	private String DICA_FIELD_BUSCAR = "Digite a descrição da despesa.";
+	private String DICA_FIELD_BUSCAR = "Digite a descrição da receita.";
 	private String DICA_FIELD_ANO = "Digite o ano.";
 	private String DICA_COMBO_MES = "Selecione o mês.";
 	private String DICA_COMBO_SITUACAO = "Selecione a situação.";
@@ -386,6 +380,8 @@ public class ReceitaView extends JInternalFrame {
 	private String ATENCAO_EDITAR = "Você já está editando uma receita.\nTermine a edição da receita atual para editar outra.";
 
 	private JButton btnRemoverReceita;
+	private JButton btnAdicionarReceita;
+	private JButton btnEditarReceita;
 	private JScrollPane scrollPaneTabela;
 	@SuppressWarnings("rawtypes")
 	private JComboBox comboSituacao;
@@ -407,4 +403,6 @@ public class ReceitaView extends JInternalFrame {
 	@SuppressWarnings("rawtypes")
 	private JComboBox comboMes;
 	private JTextField fieldAno;
+	
+	private int RECEITA;
 }

@@ -14,6 +14,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -28,56 +29,45 @@ import util.JDatePickerImpl;
 import util.TextFieldDocument;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class EditarReceitaView extends JInternalFrame {
+public class EditarDespesaView extends JInternalFrame {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public EditarReceitaView() {
+	public EditarDespesaView() {
 		initComponents();
 	}
 
 	private void initComponents() {
-		setBounds(100, 100, 570, 240);
+		setBounds(100, 100, 535, 320);
 		setTitle(NOME_TELA);
 		setClosable(true);
 		setIconifiable(true);
 		setVisible(true);
-		
+
 		// ID DO TIPO
-		this.RECEITA = 2;
-		
+		this.DESPESA = 1;
+
 		this.p = new Properties();
 		this.p.put("text.today", "Hoje");
 		this.p.put("text.month", "Mês");
 		this.p.put("text.year", "Ano");
-		
+
 		this.modelVencimento = new UtilDateModel();
 		this.panelVencimento = new JDatePanelImpl(this.modelVencimento, this.p);
-		this.pickerVencimento = new JDatePickerImpl(panelVencimento, new DateLabelFormatter());
 
 		this.modelPagamento = new UtilDateModel();
 		this.panelPagamento = new JDatePanelImpl(this.modelPagamento, this.p);
-		
+
 		this.lblValor = new JLabel(LBL_VALOR);
-		this.lblDataVencimento = new JLabel(LBL_DATA_VENCIMENTO);
-		this.lblReceitaFixa = new JLabel(LBL_RECEITA_FIXA);
-		this.lblCategoria = new JLabel(LBL_CATEGORIA);
-		this.lblConta = new JLabel(LBL_CONTA);
-		this.lblDescricao = new JLabel(LBL_DESCRICAO);
 		this.lblCod = new JLabel(LBL_COD);
-
-		this.checkReceitaFixa = new JCheckBox();
-
-		this.comboCategoria = new JComboBox();
-		this.comboConta = new JComboBox();
 		this.fieldDescricao = new JTextField();
 		this.fieldDescricao.setColumns(10);
 		this.fieldValor = new JTextField();
 		this.fieldValor.setColumns(10);
 		this.fieldCod = new JTextField();
-		
+
 		this.fieldValor.setDocument(new DecimalFieldDocument());
 		this.fieldDescricao.setDocument(new TextFieldDocument(150));
 
@@ -98,91 +88,120 @@ public class EditarReceitaView extends JInternalFrame {
 
 		getContentPane()
 				.setLayout(
-						new MigLayout("", "[86px,grow][12][125][20.00px][65px][15.00][46px][12][135.00][16.00][16.00px]", "[14px][20px][14px][21px][14px][20px][][][]"));
-		
-		getContentPane().add(lblCod, "cell 0 0");
-		
-		getContentPane().add(lblDescricao, "cell 2 0,alignx left,aligny top");
-		
+						new MigLayout(
+								"",
+								"[30.00][35.00][21.00][][44.00][25.00][21.00][20.00px][37.00px][22.00][30.00px][12][37.00][16.00][32.00px][30.00]",
+								"[14px][20px][15.00][16.00px][21px][15.00px][][20px][16.00][][][16.00][]"));
 
-		getContentPane().add(fieldCod, "cell 0 1,alignx left");
-		fieldCod.setColumns(10);
-		getContentPane().add(fieldDescricao, "cell 2 1 9 1,growx,aligny top");
-		getContentPane().add(lblValor, "cell 0 2,alignx left,aligny top");
+		getContentPane().add(lblCod, "cell 0 0 2 1");
+		this.lblDescricao = new JLabel(LBL_DESCRICAO);
+
+		getContentPane().add(lblDescricao,
+				"cell 2 0 3 1,alignx left,aligny top");
+
+		getContentPane().add(fieldCod, "cell 0 1 2 1,alignx left");
+		this.fieldCod.setColumns(5);
+		getContentPane().add(fieldDescricao, "cell 2 1 14 1,growx,aligny top");
+		getContentPane()
+				.add(lblValor, "cell 0 3 2 1,alignx left,aligny bottom");
+
+		this.lblComboCartao = new JLabel(LBL_CARTAO_CREDITO);
+		getContentPane().add(lblComboCartao,
+				"cell 4 3 5 1,alignx left,aligny bottom");
+		this.lblDataVencimento = new JLabel(LBL_DATA_VENCIMENTO);
+		getContentPane().add(lblDataVencimento,
+				"cell 12 3 4 1,alignx left,aligny bottom");
+		getContentPane().add(fieldValor,
+				"cell 0 4 3 1,alignx left,aligny center");
+
+		this.comboCartao = new JComboBox();
+		getContentPane().add(comboCartao, "cell 4 4 8 1,growx");
+		this.pickerVencimento = new JDatePickerImpl(panelVencimento,
+				new DateLabelFormatter());
+		getContentPane().add(pickerVencimento,
+				"cell 12 4 4 1,alignx left,aligny center");
+		this.lblDespesaFixa = new JLabel(LBL_DESPESA_FIXA);
+		getContentPane().add(lblDespesaFixa,
+				"cell 0 6 3 1,alignx center,aligny top");
+
+		separator_1 = new JSeparator();
+		separator_1.setOrientation(SwingConstants.VERTICAL);
+		getContentPane().add(separator_1, "cell 3 6 1 2,alignx center,growy");
 		this.lblPago = new JLabel(LBL_PAGO);
-		getContentPane().add(lblPago, "cell 6 2,alignx center,aligny top");
+		getContentPane().add(lblPago, "cell 4 6,alignx center,aligny top");
 		this.lblDataPagamento = new JLabel(LBL_DATA_PAGAMENTO);
 		getContentPane().add(lblDataPagamento,
-				"cell 8 2,alignx left,aligny top");
-		getContentPane().add(fieldValor, "cell 0 3,alignx left,aligny center");
-		getContentPane().add(pickerVencimento,
-				"cell 2 3,growx,aligny center");
-		getContentPane().add(lblDataVencimento, "cell 2 2,growx,aligny top");
-		getContentPane().add(lblReceitaFixa,
-				"cell 4 2,alignx center,aligny top");
-		getContentPane().add(checkReceitaFixa,
-				"cell 4 3,alignx center,aligny center");
+				"cell 6 6 4 1,alignx left,aligny top");
+
+		this.checkDespesaFixa = new JCheckBox();
+		getContentPane().add(checkDespesaFixa,
+				"cell 0 7 3 1,alignx center,aligny center");
 		this.checkPago = new JCheckBox();
-		getContentPane().add(checkPago, "cell 6 3,alignx center,aligny center");
+		getContentPane().add(checkPago, "cell 4 7,alignx center,aligny center");
+
+		this.checkPago.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if (checkPago.isSelected()) {
+					pickerPagamento.setButtonEnable(true);
+					setAllEditable(false);
+				} else {
+					panelPagamento.getModel().setSelected(false);
+					pickerPagamento.setButtonEnable(false);
+					setAllEditable(true);
+				}
+			}
+		});
 		
-				this.checkPago.addItemListener(new ItemListener() {
-					public void itemStateChanged(ItemEvent e) {
-						if (checkPago.isSelected()) {
-							pickerPagamento.setButtonEnable(true);
-							setAllEditable(false);
-						} else{
-							panelPagamento.getModel().setSelected(false);
-							pickerPagamento.setButtonEnable(false);
-							setAllEditable(true);
-						}
-					}
-				});
-		this.pickerPagamento = new JDatePickerImpl(panelPagamento, new DateLabelFormatter());
+		this.pickerPagamento = new JDatePickerImpl(panelPagamento,
+				new DateLabelFormatter());
 		this.pickerPagamento.setButtonEnable(false);
 		getContentPane().add(pickerPagamento,
-				"cell 8 3,growx,aligny center");
-		getContentPane().add(lblConta, "cell 0 4,alignx left,aligny top");
-		getContentPane().add(comboConta, "cell 0 5 3 1,growx");
-		getContentPane().add(comboCategoria, "cell 6 5 5 1,growx,aligny top");
-		getContentPane().add(lblCategoria, "cell 6 4,alignx left,aligny top");
+				"cell 6 7 4 1,alignx left,aligny center");
+		this.lblConta = new JLabel(LBL_CONTA);
+		getContentPane().add(lblConta, "cell 0 9 2 1,alignx left,aligny top");
+		this.lblCategoria = new JLabel(LBL_CATEGORIA);
+		getContentPane().add(lblCategoria,
+				"cell 9 9 3 1,alignx left,aligny top");
+		this.comboConta = new JComboBox();
+		getContentPane().add(comboConta, "cell 0 10 9 1,growx");
 
-		getContentPane().add(separator, "cell 0 7 11 1,growx,aligny center");
-		getContentPane().add(btnCancelar, "cell 0 8,alignx left");
+		this.comboCategoria = new JComboBox();
+		getContentPane().add(comboCategoria, "cell 9 10 7 1,growx,aligny top");
 
-		getContentPane().add(btnSalvar, "cell 8 8 3 1,alignx right");
+		getContentPane().add(separator, "cell 0 11 16 1,growx,aligny center");
+		getContentPane().add(btnCancelar, "cell 0 12 3 1,alignx left");
+
+		getContentPane().add(btnSalvar, "cell 12 12 4 1,alignx right");
 
 	}
-	
-	private void setAllEditable(boolean flag){
+
+	// HABILITA OU DESABILITA A ALTERACAO DOS VALORES DOSCOMPONENTES
+	private void setAllEditable(boolean flag) {
 		this.fieldDescricao.setEditable(flag);
 		this.fieldValor.setEditable(flag);
-		this.checkReceitaFixa.setEnabled(flag);
+		this.checkDespesaFixa.setEnabled(flag);
 		this.comboCategoria.setEnabled(flag);
+		this.comboCartao.setEnabled(flag);
 		this.comboConta.setEnabled(flag);
 		this.pickerVencimento.setButtonEnable(flag);
 	}
-	
-	private void cancelarAction(java.awt.event.ActionEvent evt){
-		if(cancelar() == 0){
+
+	private void cancelarAction(java.awt.event.ActionEvent evt) {
+		if (cancelar() == 0) {
 			closeThisFrame();
 		}
 	}
-	
-	private void salvarAction(java.awt.event.ActionEvent evt){
-		boolean flag = ReceitaView.controllerDespesaReceita.atualizar(
-				this.fieldDescricao.getText(),
-				(Date) this.pickerVencimento.getModel().getValue(),
-				(Date) this.pickerPagamento.getModel().getValue(),
-				this.fieldValor.getText(),
-				this.checkReceitaFixa.isSelected(),
-				this.comboCategoria.getSelectedItem(),
-				this.comboConta.getSelectedItem(),
-				null,
-				this.checkPago.isSelected(),
-				Integer.parseInt(this.fieldCod.getText()),
-				RECEITA
-				);
-		if(flag)
+
+	private void salvarAction(java.awt.event.ActionEvent evt) {
+		boolean flag = DespesaView.controllerDespesaReceita.atualizar(
+				this.fieldDescricao.getText(), (Date) this.pickerVencimento
+						.getModel().getValue(), (Date) this.pickerPagamento
+						.getModel().getValue(), this.fieldValor.getText(),
+				this.checkDespesaFixa.isSelected(), this.comboCategoria
+						.getSelectedItem(), this.comboConta.getSelectedItem(),
+				this.comboCartao.getSelectedItem(), this.checkPago.isSelected(), Integer
+						.parseInt(this.fieldCod.getText()), DESPESA);
+		if (flag)
 			closeThisFrame();
 	}
 
@@ -197,8 +216,8 @@ public class EditarReceitaView extends JInternalFrame {
 
 		return ExibeMensagem.showQuestionMessage(this.msg, this.title, this.type);
 	}
-	
-	private void closeThisFrame(){
+
+	private void closeThisFrame() {
 		try {
 			this.setClosed(true);
 		} catch (PropertyVetoException e) {
@@ -213,51 +232,63 @@ public class EditarReceitaView extends JInternalFrame {
 				(d.height - this.getSize().height) / 2);
 		this.toFront();
 	}
-	
-	
+
 	// METODOS PARA SETAR OS VALORES A SEREM EDITADOS.
-	public void setCod(int cod){
+	public void setCod(int cod) {
 		this.fieldCod.setText(String.valueOf(cod));
 		this.fieldCod.setEditable(false);
 	}
-	public void setDescricao(String descricao){
+
+	public void setDescricao(String descricao) {
 		this.fieldDescricao.setText(descricao);
 	}
-	public void setValor(Double valor){
+
+	public void setValor(Double valor) {
 		this.fieldValor.setText(valor.toString());
 	}
-	public void setDataVencimento(LocalDate dataVencimento){
+
+	public void setDataVencimento(LocalDate dataVencimento) {
 		this.modelVencimento.setValue(dataVencimento.toDate());
 		this.modelVencimento.setSelected(true);
 	}
-	public void setReceitaFixa(boolean flag){
-		this.checkReceitaFixa.setSelected(flag);
+
+	public void setDespesaFixa(boolean flag) {
+		this.checkDespesaFixa.setSelected(flag);
 	}
-	public void setCategoria(JComboBox comboCategoria){
+
+	public void setCategoria(JComboBox comboCategoria) {
 		this.comboCategoria.setModel(comboCategoria.getModel());
 	}
-	public void setConta(JComboBox comboConta){
+
+	public void setConta(JComboBox comboConta) {
 		this.comboConta.setModel(comboConta.getModel());
 	}
-	public void setPago(boolean flag){
+
+	public void setCartao(JComboBox comboCartao) {
+		this.comboCartao.setModel(comboCartao.getModel());
+	}
+
+	public void setPago(boolean flag) {
 		this.checkPago.setSelected(flag);
 	}
-	public void setDataPagamento(LocalDate dataPagamento){
+
+	public void setDataPagamento(LocalDate dataPagamento) {
 		this.modelPagamento.setValue(dataPagamento.toDate());
 		this.modelPagamento.setSelected(true);
 	}
 
 	// CONSTANTES
-	private String NOME_TELA = "Receita - Editar";
+	private String NOME_TELA = "Despesa - Editar";
 	private String LBL_DESCRICAO = "*Descrição";
 	private String LBL_VALOR = "*Valor";
 	private String LBL_DATA_VENCIMENTO = "*Data de Vencimento";
-	private String LBL_RECEITA_FIXA = "Receita Fixa";
+	private String LBL_DESPESA_FIXA = "Despesa Fixa";
 	private String LBL_CATEGORIA = "*Categoria";
 	private String LBL_PAGO = "Pago";
 	private String LBL_DATA_PAGAMENTO = "Data de Pagamento";
 	private String LBL_CONTA = "*Conta";
 	private String LBL_COD = "Cod.";
+	private String LBL_CARTAO_CREDITO = "Cartão de crédito";
 	private String BTN_CANCELAR = "Cancelar";
 	private String BTN_SALVAR = "Salvar";
 	private String MSG_CANCELAR = "Deseja mesmo cancelar?";
@@ -267,25 +298,27 @@ public class EditarReceitaView extends JInternalFrame {
 	private JLabel lblDescricao;
 	private JLabel lblValor;
 	private JLabel lblDataVencimento;
-	private JLabel lblReceitaFixa;
+	private JLabel lblDespesaFixa;
 	private JLabel lblCategoria;
 	private JLabel lblConta;
 	private JLabel lblPago;
 	private JLabel lblDataPagamento;
 	private JLabel lblCod;
+	private JLabel lblComboCartao;
 
 	// FIELD
-	private JTextField fieldCod;
 	private JTextField fieldDescricao;
 	private JTextField fieldValor;
+	private JTextField fieldCod;
 
 	// CHECK
 	private JCheckBox checkPago;
-	private JCheckBox checkReceitaFixa;
+	private JCheckBox checkDespesaFixa;
 
 	// COMBO
 	private JComboBox comboCategoria;
 	private JComboBox comboConta;
+	private JComboBox comboCartao;
 
 	// SEPARATOR
 	private JSeparator separator;
@@ -298,8 +331,8 @@ public class EditarReceitaView extends JInternalFrame {
 	private String msg;
 	private String title;
 	private int type;
-	private int RECEITA;
-	
+	private int DESPESA;
+
 	// DATE PICKER
 	private JDatePickerImpl pickerVencimento;
 	private JDatePickerImpl pickerPagamento;
@@ -308,4 +341,5 @@ public class EditarReceitaView extends JInternalFrame {
 	private JDatePanelImpl panelVencimento;
 	private JDatePanelImpl panelPagamento;
 	private Properties p;
+	private JSeparator separator_1;
 }

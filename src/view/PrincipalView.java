@@ -114,6 +114,7 @@ public class PrincipalView extends javax.swing.JFrame {
 
 		this.despesaView = null;
 		this.receitaView = null;
+		this.cartaoView = null;
 
 		setResizable(false);
 		setTitle(NOME_SISTEMA);
@@ -142,6 +143,11 @@ public class PrincipalView extends javax.swing.JFrame {
 		menuBar.add(btnCategoria);
 
 		btnCartaoCredito = new JButton(CARTAO_BTN_MENU);
+		btnCartaoCredito.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				cartaoView(evt);
+			}
+		});
 		menuBar.add(btnCartaoCredito);
 
 		btnConta = new JButton(CONTA_BTN_MENU);
@@ -232,6 +238,30 @@ public class PrincipalView extends javax.swing.JFrame {
 			e.printStackTrace();
 		}
 	}
+	
+	private void cartaoView(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_itemEstoqueProdutoActionPerformed
+		if (cartaoView == null) {
+			cartaoView = new CartaoView();
+			PrincipalView.getPainel().add(cartaoView);
+			cartaoView.setClosable(false);
+			cartaoView.setPosicao();
+			cartaoView.setVisible(true);
+		} else {
+			try {
+				cartaoView.setIcon(false);
+			} catch (PropertyVetoException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		try {
+			cartaoView.setSelected(true);
+			cartaoView.requestFocusInWindow();
+		} catch (PropertyVetoException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	private JMenuBar menuBar;
 	private JButton btnReceita;
@@ -250,5 +280,6 @@ public class PrincipalView extends javax.swing.JFrame {
 	private String CARTAO_BTN_MENU = "Cartão de Crédito";
 	private DespesaView despesaView;
 	private ReceitaView receitaView;
+	private CartaoView cartaoView;
 	private static JLabel lblCarregando = new JLabel("Aguarde...");
 }

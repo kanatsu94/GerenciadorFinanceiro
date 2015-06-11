@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
 
 import model.CartaoCredito;
 import model.Categoria;
@@ -18,6 +17,8 @@ import model.Tipo;
 import org.joda.time.LocalDate;
 
 import table.DespesaReceitaTableModel;
+import util.ExibeMensagem;
+import view.EditarDespesaView;
 import view.EditarReceitaView;
 import dao.CategoriaDAO;
 import dao.ContaDAO;
@@ -27,10 +28,13 @@ import factory.DespesaReceitaFactory;
 
 @SuppressWarnings("rawtypes")
 public class DespesaReceitaController {
+
 	private DespesaReceitaDAO dao;
 	private TipoDAO daoTipo;
 	private CategoriaDAO daoCategoria;
 	private ContaDAO daoConta;
+	
+	private CartaoCreditoController cartaoController;
 
 	private static String TITLE_ADD = "Nova ";
 	private static String TITLE_REMOVER = "Remover ";
@@ -49,6 +53,7 @@ public class DespesaReceitaController {
 	private static String REMOVER_FALHA = "Erro ao remover ";
 	private static String ATUALIZAR_SUCESSO = "(s) atualizada(s) com sucesso!";
 	private static String ATUALIZAR_FALHA = "Erro ao atualizar ";
+	private static String REMOVER_ID_0 = "Não é possível remover. Esta é uma ";
 
 	// MSG = MENSAGEM DO SISTEMA PARA INFORMAR O USUARIO O QUE ESTA ACONTECENDO.
 	// TYPE = TIPO DA MENSAGEM (ERRO, INFORMACAO, SUCESSO).
@@ -84,7 +89,8 @@ public class DespesaReceitaController {
 		this.DESPESA = daoTipo.procurar(1);
 		this.totalDespesa = "";
 		this.totalReceita = "";
-		this.df = new DecimalFormat("0.##");
+		this.df = new DecimalFormat("#,##0.00");
+		this.cartaoController = new CartaoCreditoController();
 	}
 
 	// RECUPERA TODOS OS REGISTROS DE DESPESA/RECEITA DO
@@ -172,24 +178,29 @@ public class DespesaReceitaController {
 			if (r.getDataVencimento().getMonthOfYear() == mes
 					&& r.getDataVencimento().getYear() == ano) {
 				this.listaReceita.add(r);
-			} else if ((r.getDataVencimento().getMonthOfYear() < mes && r.getDataVencimento().getYear() <= ano && r.getFixa()) || (r.getDataVencimento().getYear() < ano && r.getFixa())) {
-							DespesaReceita nova = new DespesaReceita(
-									r.getDescricao(),
-									r.getDataVencimento().withMonthOfYear(mes)
-											.withYear(ano), r.getValor());
-							
-							if (!novaLista.contains(nova) && !this.listaReceita.contains(nova)){
-								nova.setCartaoCreditoBean(null);
-								nova.setCategoriaBean(r.getCategoriaBean());
-								nova.setDataMovimentacao(null);
-								nova.setContaBean(r.getContaBean());
-								nova.setFixa(r.getFixa());
-								nova.setParcelaId(null);
-								nova.setTipoBean(RECEITA);
-								
-								this.listaReceita.add(nova);
-							}
+			} else if ((r.getDataVencimento().getMonthOfYear() < mes
+					&& r.getDataVencimento().getYear() <= ano && r.getFixa())
+					|| (r.getDataVencimento().getYear() < ano && r.getFixa())) {
+
+				DespesaReceita nova = new DespesaReceita(r.getDescricao(),
+						r.getDataVencimento().withMonthOfYear(mes)
+								.withYear(ano), r.getValor());
+				nova.setCategoriaBean(r.getCategoriaBean());
+				nova.setFixa(false);
+				nova.setContaBean(r.getContaBean());
+
+				if (!novaLista.contains(nova)) {
+					nova.setFixa(true);
+					if (!this.listaReceita.contains(nova)) {
+						nova.setCartaoCreditoBean(null);
+						nova.setDataMovimentacao(null);
+						nova.setParcelaId(null);
+						nova.setTipoBean(RECEITA);
+
+						this.listaReceita.add(nova);
 					}
+				}
+			}
 		}
 		Collections.sort(this.listaReceita);
 
@@ -217,9 +228,55 @@ public class DespesaReceitaController {
 		this.listaDespesa.clear();
 
 		for (DespesaReceita d : novaLista) {
+			// VERIFICA SE O MES DE VENCIMENTO DA DESPESA E O MESMO
+			// MES QUE FOI SELECIONADO, E SE O ANO DA DESPESA E O
+			// MESMO QUE O ANO SELECIONADO.
 			if (d.getDataVencimento().getMonthOfYear() == mes
 					&& d.getDataVencimento().getYear() == ano) {
 				this.listaDespesa.add(d);
+			}
+			/*
+			 * VERIFICA SE A DATA DE VENCIMENTO DA DESPESA E MENOR QUE A DATA
+			 * SELECIONADA SE FOR MENOR E A DESPESA FOR FIXA, ENTAO CRIAMOS A
+			 * DESPESA.
+			 */
+			else if ((d.getDataVencimento().getMonthOfYear() < mes
+					&& d.getDataVencimento().getYear() <= ano && d.getFixa())
+					|| (d.getDataVencimento().getYear() < ano && d.getFixa())) {
+
+				/*
+				 * UMA COPIA DA DESPESA E CRIADA, COM SEU VALOR DE FIXO SETADO
+				 * PARA FALSE. ISSO E FEITO PARA VERIFICAR SE ESSA JA FOI
+				 * DESMARCADA COMO FIXO.
+				 */
+				DespesaReceita nova = new DespesaReceita(d.getDescricao(),
+						d.getDataVencimento().withMonthOfYear(mes)
+								.withYear(ano), d.getValor());
+
+				nova.setCategoriaBean(d.getCategoriaBean());
+				nova.setFixa(false);
+				nova.setContaBean(d.getContaBean());
+
+				/*
+				 * EXECUTA A VERIFICACAO NA LISTA DE DESPESAS.
+				 */
+				if (!novaLista.contains(nova)) {
+					/*
+					 * SE NAO EXISTIR NENHUMA DESPESA COM FIXO FALSE, ENTAO
+					 * VOLTAMOS PARA TRUE E VERIFICAMOS SE ESSA DESPESA JA FOI
+					 * ADICIONADA A LISTA QUE IRA ALIMENTAR O TABLE MODEL.
+					 */
+					nova.setFixa(true);
+					if (!this.listaDespesa.contains(nova)
+							&& !comparaPorDataVencimento(novaLista, nova)) {
+						nova.setCartaoCreditoBean(d.getCartaoCreditoBean());
+						nova.setDataMovimentacao(null);
+						nova.setParcelaId(null);
+						nova.setTipoBean(DESPESA);
+
+						this.listaDespesa.add(nova);
+					}
+				}
 			}
 		}
 		Collections.sort(this.listaDespesa);
@@ -234,11 +291,21 @@ public class DespesaReceitaController {
 				pago = pago + d.getValor();
 		}
 
-		this.totalDespesa = "Pago: R$" + df.format(pago) + " | A pagar: R$"
+		this.totalDespesa = "Pago: R$" + df.format(pago) + " | Não pago: R$"
 				+ df.format(naoPago) + " | Total: R$"
 				+ df.format(pago + naoPago);
 
-		return new DespesaReceitaTableModel(listaDespesa);
+		return new DespesaReceitaTableModel(this.listaDespesa);
+	}
+
+	private boolean comparaPorDataVencimento(List<DespesaReceita> lista,
+			DespesaReceita dr) {
+		for (DespesaReceita deRe : lista) {
+			if (deRe.equalsDateVencimento(dr))
+				return true;
+		}
+
+		return false;
 	}
 
 	public String getTotalReceita() {
@@ -265,9 +332,10 @@ public class DespesaReceitaController {
 		boolean flag = true;
 
 		if (validaCampos(descricao, dataVencimento, dataMovimentacao, valor,
-				pago)) {
+				pago, cartaoCredito)) {
 			LocalDate movimentacao = null;
-
+			this.title = tipo.getDescricao();
+			
 			if (parcelas.equals(""))
 				parcelas = "1";
 			if (dataMovimentacao != null)
@@ -291,8 +359,8 @@ public class DespesaReceitaController {
 				this.type = 1;
 				this.msg = tipo.getDescricao() + SALVAR_SUCESSO;
 			}
-			
-			showMessage();
+
+			ExibeMensagem.showMessage(this.msg, this.title, this.type);
 		} else {
 			flag = false;
 		}
@@ -301,16 +369,18 @@ public class DespesaReceitaController {
 
 	// VALIDACAO DOS CAMPOS
 	private boolean validaCampos(String descricao, Date dataVencimento,
-			Date dataMovimentacao, String valor, boolean pago) {
+			Date dataMovimentacao, String valor, boolean pago,
+			Object cartaoCredito) {
 		boolean retorno = true;
 		this.msg = "Você precisa fornecer as seguintes informações:\n\n";
+		this.title = "Erro";
 		// DESCRICAO.REPLACEALL().ISEMPTY() = REMOVE TODOS OS ESPACOS EM
 		// BRANCO E CONFERE SE FICOU VAZIO.
 		if (descricao.isEmpty() || descricao.replaceAll("\\s+", "").isEmpty()) {
 			this.msg = msg + DespesaReceitaController.NULL_DESCRICAO;
 			retorno = false;
 		}
-		if (dataVencimento == null) {
+		if (dataVencimento == null && cartaoCredito == null) {
 			this.msg = msg + DespesaReceitaController.NULL_VENCIMENTO;
 			retorno = false;
 		}
@@ -318,7 +388,7 @@ public class DespesaReceitaController {
 			this.msg = msg + DespesaReceitaController.NULL_MOVIMENTACAO;
 			retorno = false;
 		}
-		if (valor.equals("")) {
+		if (valor.isEmpty()) {
 			this.msg = msg + DespesaReceitaController.NULL_VALOR;
 			retorno = false;
 		} else {
@@ -329,61 +399,80 @@ public class DespesaReceitaController {
 				retorno = false;
 			}
 		}
-		
-		if(!retorno)
-			showMessage();
+
+		if (!retorno)
+			ExibeMensagem.showMessage(this.msg, this.title, this.type);
 
 		return retorno;
 	}
 
 	// REMOVE DESPESA/RECEITA
-	public boolean remover(Object id) {
-		DespesaReceita dr = dao.procurar((int) id);
+	public boolean remover(Object id, int tipo) {
 		boolean flag = false;
-		int num = 1;
+		Tipo t;
+		
+		
+		if(tipo == 1)
+			t = DESPESA;
+		else
+			t = RECEITA;
+		
+		if ((int) id == 0) {
+			this.title = TITLE_REMOVER;
+			this.msg = REMOVER_ID_0 + t.getDescricao().toLowerCase() + " criada automaticamente.";
+			this.type = 2;
+			ExibeMensagem.showMessage(this.msg, this.title, this.type);
+		}
+		
+		else {
+			DespesaReceita dr = dao.procurar((int) id);
+			int num = 1;
 
-		this.title = TITLE_REMOVER + dr.getTipoBean().getDescricao();
-		this.msg = REMOVER_CONFIRMACAO;
-		this.type = 0;
+			this.title = TITLE_REMOVER + t.getDescricao();
+			this.msg = REMOVER_CONFIRMACAO;
 
-		if (showQuestionMessage() == 0) {
-			flag = true;
+			if (ExibeMensagem.showQuestionMessage(this.msg, this.title, this.type) == 0) {
+				flag = true;
 
-			this.title = TITLE_REMOVER + dr.getTipoBean().getDescricao();
-			this.msg = MSG_PARCELA;
+				this.title = TITLE_REMOVER + t.getDescricao();
+				this.msg = MSG_PARCELA;
 
-			// NESSE CASO, INDICA QUE TEREMOS SOMENTE A OPCAO DE RESPONDER
-			// SIM OU NAO NO CONFIRMDIALOG.
-			this.type = 0;
-
-			if (dr.getParcelaId() != null && dr.getDataMovimentacao() == null
-					&& showQuestionMessage() == 0) {
-
-				num = dao.removerPorParcelaId(dr.getParcelaId());
-
-				// CASO TENHA REMOVIDO, O SISTEMA EXIBE UMA MENSAGEM DE
-				// SUCESSO
-				if (num <= 0) {
-					flag = false;
-				}
-			} else
-				// CASO TENHA REMOVIDO, O SISTEMA EXIBE UMA MENSAGEM DE SUCESSO
-				flag = dao.remover(dr);
-
-			if (flag) {
-				this.msg = num + " "
-						+ dr.getTipoBean().getDescricao().toLowerCase()
-						+ REMOVER_SUCESSO;
-				this.title = TITLE_REMOVER;
-				this.type = 1;
-			} else {
-				this.msg = REMOVER_FALHA
-						+ dr.getTipoBean().getDescricao().toLowerCase() + ".";
-				this.title = TITLE_REMOVER;
+				// NESSE CASO, INDICA QUE TEREMOS SOMENTE A OPCAO DE RESPONDER
+				// SIM OU NAO NO CONFIRMDIALOG.
 				this.type = 0;
-			}
 
-			showMessage();
+				if (dr.getParcelaId() != null
+						&& dr.getDataMovimentacao() == null
+						&& ExibeMensagem.showQuestionMessage(this.msg, this.title, this.type) == 0) {
+
+					num = dao.removerPorParcelaId(dr.getParcelaId());
+
+					// CASO TENHA REMOVIDO, O SISTEMA EXIBE UMA MENSAGEM DE
+					// SUCESSO
+					if (num <= 0) {
+						flag = false;
+					}
+				} else
+					// CASO TENHA REMOVIDO, O SISTEMA EXIBE UMA MENSAGEM DE
+					// SUCESSO
+					flag = dao.remover(dr);
+
+				if (flag) {
+					this.msg = num + " "
+							+ dr.getTipoBean().getDescricao().toLowerCase()
+							+ REMOVER_SUCESSO;
+					this.title = TITLE_REMOVER;
+					this.type = 1;
+				} else {
+					this.msg = REMOVER_FALHA
+							+ dr.getTipoBean().getDescricao().toLowerCase()
+							+ ".";
+					this.title = TITLE_REMOVER;
+					this.type = 0;
+				}
+
+				ExibeMensagem.showMessage(this.msg, this.title, this.type);
+			}
 		}
 
 		return flag;
@@ -399,12 +488,12 @@ public class DespesaReceitaController {
 		boolean flag = true;
 
 		if (id == 0) {
-			salvar(descricao, dataVencimento, dataMovimentacao, valor, fixa,
-					categoria, tipo, conta, cartaoCredito, "1", pago);
+			flag = salvar(descricao, dataVencimento, dataMovimentacao, valor,
+					fixa, categoria, tipo, conta, cartaoCredito, "1", pago);
 		}
 
 		else if (validaCampos(descricao, dataVencimento, dataMovimentacao,
-				valor, pago)) {
+				valor, pago, cartaoCredito)) {
 
 			dr = dao.procurar(id);
 
@@ -414,7 +503,10 @@ public class DespesaReceitaController {
 			dr.setFixa(fixa);
 			dr.setCategoriaBean((Categoria) categoria);
 			dr.setContaBean((Conta) conta);
-			dr.setCartaoCreditoBean((CartaoCredito) cartaoCredito);
+			if(((CartaoCredito) cartaoCredito).getId() <= 0){
+				dr.setCartaoCreditoBean(null);
+			}else
+				dr.setCartaoCreditoBean((CartaoCredito) cartaoCredito);
 
 			LocalDate movimentacao;
 
@@ -436,7 +528,7 @@ public class DespesaReceitaController {
 			// E CASO EXISTA, PERGUNTA SE QUER PROPAGAR A ALTERACAO.
 			if (dr.getParcelaId() != null
 					&& dao.procurar(dr.getId()).getDataMovimentacao() == null
-					&& showQuestionMessage() == 0)
+					&& ExibeMensagem.showQuestionMessage(this.msg, this.title, this.type) == 0)
 
 				flag = dao.atualizarPorParcelaId(dr);
 
@@ -456,12 +548,19 @@ public class DespesaReceitaController {
 				this.title = TITLE_ATUALIZAR;
 				this.type = 0;
 			}
-			
-			showMessage();
+
+			ExibeMensagem.showMessage(this.msg, this.title, this.type);
 		} else {
 			flag = false;
 		}
 		return flag;
+	}
+	
+	/*
+	 * ATUALIZA UMA DESPESA/RECEITA SEM REALIZAR VERIFICACOES.
+	 */
+	public boolean atualizarSemVerificao(DespesaReceita dr){
+		return this.dao.atualizar(dr);
 	}
 
 	public EditarReceitaView abrirEditarReceitaView(Object id) {
@@ -491,6 +590,48 @@ public class DespesaReceitaController {
 				}
 
 				return editarReceitaView;
+			}
+		}
+
+		return null;
+	}
+
+	public EditarDespesaView abrirEditarDespesaView(Object id) {
+		EditarDespesaView editarDespesaView;
+
+		for (DespesaReceita dr : listaDespesa) {
+			if (dr.getId() == (int) id) {
+				editarDespesaView = new EditarDespesaView();
+
+				JComboBox comboConta = getComboConta();
+				comboConta.setSelectedItem(dr.getContaBean());
+
+				JComboBox comboCategoria = getComboCategoriaDespesa();
+				comboCategoria.setSelectedItem(dr.getCategoriaBean());
+
+				JComboBox comboCartao = getComboCartaoCredito();
+				if(dr.getCartaoCreditoBean() != null)
+					comboCartao.setSelectedItem(dr.getCartaoCreditoBean());
+				else
+					comboCartao.setSelectedIndex(0);
+
+				editarDespesaView.setCod(dr.getId());
+				editarDespesaView.setDescricao(dr.getDescricao());
+				editarDespesaView.setConta(comboConta);
+				editarDespesaView.setCategoria(comboCategoria);
+				editarDespesaView.setCartao(comboCartao);
+				editarDespesaView.setValor(dr.getValor());
+				editarDespesaView.setDespesaFixa(dr.getFixa());
+				editarDespesaView.setDataVencimento(dr.getDataVencimento());
+				if (dr.getDataMovimentacao() != null) {
+					editarDespesaView.setPago(true);
+					editarDespesaView
+							.setDataPagamento(dr.getDataMovimentacao());
+				} else {
+					editarDespesaView.setPago(false);
+				}
+
+				return editarDespesaView;
 			}
 		}
 
@@ -540,18 +681,9 @@ public class DespesaReceitaController {
 
 		return combo;
 	}
-
-	// EXIBE MENSAGENS
-	private void showMessage() {
-		JOptionPane.showMessageDialog(null, this.msg, this.title, this.type);
+	
+	public JComboBox<CartaoCredito> getComboCartaoCredito(){
+		return cartaoController.getComboCartaoCredito();
 	}
-
-	private int showQuestionMessage() {
-
-		// 0 = SIM
-		// 1 = NAO
-		// 2 = CANCELAR
-		return JOptionPane.showConfirmDialog(null, this.msg, this.title,
-				this.type);
-	}
+	
 }

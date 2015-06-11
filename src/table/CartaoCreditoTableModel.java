@@ -1,37 +1,36 @@
 package table;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import model.DespesaReceita;
+import model.CartaoCredito;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-public class DespesaReceitaTableModel extends AbstractTableModel {
+public class CartaoCreditoTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 
-	// LISTA DE DESPESARECEITA QUE REPRESENTAM AS LINHAS.
-	private List<DespesaReceita> linhas;
+	// LISTA DE CARTAOCREDITO QUE REPRESENTAM AS LINHAS.
+	private List<CartaoCredito> linhas;
 
 	// ARRAY DE STRINGS COM O NOME DAS COLUNAS.
-	private String[] colunas = new String[] { "Cod.", "Descrição", "Valor",
-			"Categoria", "Vencimento", "Pago" };
+	private String[] colunas = new String[] { "Cod.", "Descrição", "Dia Vencimento",
+			"Dia Fechamento"};
 	
-	// CRIA UM DESPESARECEITATABLEMODEL VAZIO.
-	public DespesaReceitaTableModel() {
-		linhas = new ArrayList<DespesaReceita>();
+	// CRIA UM CARTAOCREDITOTABLEMODEL VAZIO.
+	public CartaoCreditoTableModel() {
+		linhas = new ArrayList<CartaoCredito>();
 	}
 
 	/*
-	 * CRIA UM DESPESARECEITATABLEMODEL CARREGADO COM A LISTA DE DESPESARECEITA
+	 * CRIA UM CARTAOCREDITOTABLEMODEL CARREGADO COM A LISTA DE CARTAOCREDITO
 	 * ESPECIFICADA.
 	 */
-	public DespesaReceitaTableModel(List<DespesaReceita> listaDeDespesaReceita) {
-		linhas = new ArrayList<DespesaReceita>(listaDeDespesaReceita);
+	public CartaoCreditoTableModel(List<CartaoCredito> listaDeCartaoCredito) {
+		linhas = new ArrayList<CartaoCredito>(listaDeCartaoCredito);
 	}
 
 	// RETORNA A QUANTIDADE DE COLUNAS.
@@ -61,9 +60,8 @@ public class DespesaReceitaTableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		DespesaReceita despesareceita = linhas.get(rowIndex);
+		CartaoCredito cartaocredito = linhas.get(rowIndex);
 		DateTimeFormatter dataFormat = DateTimeFormat.forPattern("dd/MM/yyyy");
-		DecimalFormat df = new DecimalFormat("#,##0.00");
 
 		// RETORNA O CAMPO REFERENTE A COLUNA ESPECIFICADA.
 		// AQUI E FEITO UM SWITCH PARA VERIFICAR QUAL E A COLUNA
@@ -71,20 +69,13 @@ public class DespesaReceitaTableModel extends AbstractTableModel {
 		// QUE FORAM ESPECIFICADAS NO ARRAY "COLUNAS".
 		switch (columnIndex) {
 		case 0:
-			return despesareceita.getId();
+			return cartaocredito.getId();
 		case 1:
-			return despesareceita.getDescricao();
+			return cartaocredito.getDescricao();
 		case 2:
-			return df.format(despesareceita.getValor());
+			return dataFormat.print(cartaocredito.getVencimento());
 		case 3:
-			return despesareceita.getCategoriaBean().getDescricao();
-		case 4:
-			return dataFormat.print(despesareceita.getDataVencimento());
-		case 5:
-			if(despesareceita.getDataMovimentacao() != null)
-				return dataFormat.print(despesareceita.getDataMovimentacao());
-			else
-				return "-";
+			return dataFormat.print(cartaocredito.getDiasFechamento());
 		default:
 			// ISTO NAO DEVERIA ACONTECER...
 			throw new IndexOutOfBoundsException(
@@ -96,22 +87,22 @@ public class DespesaReceitaTableModel extends AbstractTableModel {
 	// // MODIFICA NA LINHA E COLUNA ESPECIFICADA.
 	// public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 	// // CARREGA O ITEM DA LINHA QUE DEVE SER MODIFICADO.
-	// DespesaReceita despesareceita = linhas.get(rowIndex);
+	// CartaoCredito cartaocredito = linhas.get(rowIndex);
 	//
 	// // SETA O VALOR DO CAMPO RESPECTIVO
 	// switch (columnIndex) {
 	// case 0:
-	// despesareceita.setId((Integer) aValue);
+	// cartaocredito.setId((Integer) aValue);
 	// case 1:
-	// despesareceita.setProduto((Produto) aValue);
+	// cartaocredito.setProduto((Produto) aValue);
 	// case 2:
-	// despesareceita.setQuantidade((Float) aValue);
+	// cartaocredito.setQuantidade((Float) aValue);
 	// case 3:
-	// despesareceita.setValorUnitario((Double) aValue);
+	// cartaocredito.setValorUnitario((Double) aValue);
 	// case 4:
-	// despesareceita.setDataFabricacao((Date) aValue);
+	// cartaocredito.setDataFabricacao((Date) aValue);
 	// case 5:
-	// despesareceita.setDataValidade((Date) aValue);
+	// cartaocredito.setDataValidade((Date) aValue);
 	//
 	// default:
 	// // ISTO NAO DEVERIA ACONTECER...
@@ -120,17 +111,17 @@ public class DespesaReceitaTableModel extends AbstractTableModel {
 	// }
 	//
 	// // MODIFICA NA LINHA ESPECIFICADA
-	// public void setValueAt(DespesaReceita aValue, int rowIndex) {
+	// public void setValueAt(CartaoCredito aValue, int rowIndex) {
 	//
 	// // CARREGA O ITEM DA LINHA QUE DEVE SER MODIFICADO
-	// DespesaReceita despesareceita = linhas.get(rowIndex);
+	// CartaoCredito cartaocredito = linhas.get(rowIndex);
 	//
-	// despesareceita.setCodigoDespesaReceita(aValue.getCodigoDespesaReceita());
-	// despesareceita.setProduto(aValue.getProduto());
-	// despesareceita.setQuantidade(aValue.getQuantidade());
-	// despesareceita.setValorUnitario(aValue.getValorUnitario());
-	// despesareceita.setDataFabricacao(aValue.getDataFabricacao());
-	// despesareceita.setDataValidade(aValue.getDataValidade());
+	// cartaocredito.setCodigoCartaoCredito(aValue.getCodigoCartaoCredito());
+	// cartaocredito.setProduto(aValue.getProduto());
+	// cartaocredito.setQuantidade(aValue.getQuantidade());
+	// cartaocredito.setValorUnitario(aValue.getValorUnitario());
+	// cartaocredito.setDataFabricacao(aValue.getDataFabricacao());
+	// cartaocredito.setDataValidade(aValue.getDataValidade());
 	//
 	// fireTableCellUpdated(rowIndex, 0);
 	// fireTableCellUpdated(rowIndex, 1);
@@ -146,12 +137,12 @@ public class DespesaReceitaTableModel extends AbstractTableModel {
 		return false;
 	}
 
-	public DespesaReceita getDespesaReceita(int indiceLinha) {
+	public CartaoCredito getCartaoCredito(int indiceLinha) {
 		return linhas.get(indiceLinha);
 	}
 
 	// ADICIONA UM REGISTRO.
-	public void addDespesaReceita(DespesaReceita m) {
+	public void addCartaoCredito(CartaoCredito m) {
 		// ADICIONA O REGISTRO.
 		linhas.add(m);
 
@@ -161,19 +152,19 @@ public class DespesaReceitaTableModel extends AbstractTableModel {
 	}
 
 	// REMOVE A LINHA ESPECIFICADA.
-	public void removeDespesaReceita(int indiceLinha) {
+	public void removeCartaoCredito(int indiceLinha) {
 		linhas.remove(indiceLinha);
 
 		fireTableRowsDeleted(indiceLinha, indiceLinha);
 	}
 
 	// ADICIONA UMA LISTA DE ESTOQUEPRODUTO AO FINAL DOS REGISTROS.
-	public void addListaDeDespesaReceita(List<DespesaReceita> despesareceita) {
+	public void addListaDeCartaoCredito(List<CartaoCredito> cartaocredito) {
 		// PEGA O TAMANHO ANTIGO DA TABELA.
 		int tamanhoAntigo = getRowCount();
 
 		// ADICIONA OS REGISTROS.
-		linhas.addAll(despesareceita);
+		linhas.addAll(cartaocredito);
 
 		fireTableRowsInserted(tamanhoAntigo, getRowCount() - 1);
 	}

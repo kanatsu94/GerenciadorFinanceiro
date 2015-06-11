@@ -63,6 +63,7 @@ public class DespesaReceitaDAO extends GenericDAO<DespesaReceita> implements
 				d.setValor(dr.getValor());
 				d.setFixa(dr.getFixa());
 				d.setCategoriaBean(dr.getCategoriaBean());
+				d.setCartaoCreditoBean(dr.getCartaoCreditoBean());
 				d.setDataMovimentacao(dr.getDataMovimentacao());
 				d.setContaBean(dr.getContaBean());
 				
