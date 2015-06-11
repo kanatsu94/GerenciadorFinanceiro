@@ -90,6 +90,7 @@ public class ReceitaView extends JInternalFrame {
 
 		table = new JTable();
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.getTableHeader().setReorderingAllowed(false);//impede que as colunas sejam movidas
 		table.setRowHeight(30);
 
 		btnBuscar = new JButton(BTN_BUSCAR);

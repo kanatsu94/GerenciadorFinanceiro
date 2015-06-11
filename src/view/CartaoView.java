@@ -3,6 +3,7 @@ package view;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.security.Principal;
 
 import javax.swing.JButton;
 import javax.swing.JInternalFrame;
@@ -28,11 +29,9 @@ public class CartaoView extends JInternalFrame {
 		setIconifiable(true);
 		
 		btnAdicionarCartao = new JButton(BTN_ADICIONAR);
-		btnAdicionarCartao
-				.addActionListener(new java.awt.event.ActionListener() {
+		btnAdicionarCartao.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent evt) {
-						//--
-						
+						addCartaoView();
 					}
 				});
 		btnAdicionarCartao.setBounds(20, 42, 89, 23);
@@ -40,7 +39,7 @@ public class CartaoView extends JInternalFrame {
 		btnEditaCartao = new JButton(BTN_EDITAR);
 		btnEditaCartao.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				//--
+				edtCartaoView();
 			}
 		});
 		btnEditaCartao.setBounds(121, 42, 89, 23);
@@ -111,6 +110,22 @@ public class CartaoView extends JInternalFrame {
 		
 	}
 	
+	private void addCartaoView(){
+		adicionaCartao = new AdicionaCartao();
+		PrincipalView.getPainel().add(adicionaCartao);
+		adicionaCartao.setIconifiable(false);
+		adicionaCartao.setClosable(false);
+		adicionaCartao.moveToFront();
+	}
+	
+	private void edtCartaoView(){
+		editaCartao = new EditaCartao();
+		PrincipalView.getPainel().add(editaCartao);
+		editaCartao.setIconifiable(false);
+		editaCartao.setClosable(false);
+		editaCartao.moveToFront();
+	}
+	
 	public void setPosicao() {
 		Dimension d = this.getDesktopPane().getSize();
 		this.setLocation((d.width - this.getSize().width) / 2,
@@ -134,4 +149,5 @@ public class CartaoView extends JInternalFrame {
 	private JScrollPane scrollPaneTabela;
 	
 	private AdicionaCartao adicionaCartao;
+	private EditaCartao editaCartao;
 }

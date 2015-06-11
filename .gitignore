@@ -37,3 +37,4 @@ src/META-INF/
 .Trashes
 ehthumbs.db
 Thumbs.db
+.classpath
