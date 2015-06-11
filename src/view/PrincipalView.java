@@ -17,8 +17,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
 import controller.MainController;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class PrincipalView extends javax.swing.JFrame {
 
@@ -145,13 +143,8 @@ public class PrincipalView extends javax.swing.JFrame {
 		menuBar.add(btnCategoria);
 
 		btnCartaoCredito = new JButton(CARTAO_BTN_MENU);
-<<<<<<< HEAD
 		btnCartaoCredito.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-=======
-		btnCartaoCredito.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
->>>>>>> origin/master
 				cartaoView(evt);
 			}
 		});
@@ -246,46 +239,27 @@ public class PrincipalView extends javax.swing.JFrame {
 		}
 	}
 	
-<<<<<<< HEAD
 	private void cartaoView(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_itemEstoqueProdutoActionPerformed
 		if (cartaoView == null) {
-=======
-	private void cartaoView(java.awt.event.ActionEvent evt){
-		if(cartaoView == null){
->>>>>>> origin/master
 			cartaoView = new CartaoView();
 			PrincipalView.getPainel().add(cartaoView);
 			cartaoView.setClosable(false);
 			cartaoView.setPosicao();
 			cartaoView.setVisible(true);
-<<<<<<< HEAD
 		} else {
 			try {
 				cartaoView.setIcon(false);
 			} catch (PropertyVetoException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-=======
-		}
-		else{
-			try {
-				cartaoView.setIcon(true);
-			} catch (Exception e) {
-				// TODO: handle exception
->>>>>>> origin/master
 			}
 		}
 		try {
 			cartaoView.setSelected(true);
 			cartaoView.requestFocusInWindow();
-<<<<<<< HEAD
 		} catch (PropertyVetoException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-=======
-		} catch (Exception e) {
-			// TODO: handle exception
->>>>>>> origin/master
 		}
 	}
 

@@ -1,17 +1,11 @@
 package view;
 
 import java.awt.Dimension;
-<<<<<<< HEAD
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
 import java.util.Vector;
-=======
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.security.Principal;
->>>>>>> origin/master
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -52,7 +46,6 @@ public class CartaoView extends JInternalFrame {
 		setTitle(NOME_TELA);
 		setClosable(true);
 		setIconifiable(true);
-<<<<<<< HEAD
 
 		fieldBusca = new JTextField();
 		fieldBusca.setToolTipText(DICA_FIELD_BUSCAR);
@@ -87,13 +80,6 @@ public class CartaoView extends JInternalFrame {
 				.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent evt) {
 						addReceitaView(evt);
-=======
-		
-		btnAdicionarCartao = new JButton(BTN_ADICIONAR);
-		btnAdicionarCartao.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent evt) {
-						addCartaoView();
->>>>>>> origin/master
 					}
 				});
 		btnAdicionarCartao.setBounds(20, 42, 89, 23);
@@ -102,11 +88,7 @@ public class CartaoView extends JInternalFrame {
 		menuBar.add(btnEditarCartao);
 		btnEditarCartao.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-<<<<<<< HEAD
 				editReceitaView(evt);
-=======
-				edtCartaoView();
->>>>>>> origin/master
 			}
 		});
 		btnEditarCartao.setBounds(121, 42, 89, 23);
@@ -124,7 +106,6 @@ public class CartaoView extends JInternalFrame {
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
-<<<<<<< HEAD
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -134,22 +115,6 @@ public class CartaoView extends JInternalFrame {
 							.addComponent(fieldBusca, GroupLayout.DEFAULT_SIZE, 301, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnBuscar)))
-=======
-				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(scrollPaneTabela, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
-						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(btnAdicionarCartao)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnEditaCartao)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnRemoveCartao)
-							.addPreferredGap(ComponentPlacement.RELATED, 167, Short.MAX_VALUE)
-							.addComponent(fieldBusca, GroupLayout.PREFERRED_SIZE, 201, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnBusca)))
->>>>>>> origin/master
 					.addContainerGap())
 		);
 		groupLayout.setVerticalGroup(
@@ -157,22 +122,11 @@ public class CartaoView extends JInternalFrame {
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-<<<<<<< HEAD
 						.addComponent(btnBuscar, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
 						.addComponent(fieldBusca, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addComponent(scrollPaneTabela, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
 					.addGap(44))
-=======
-						.addComponent(fieldBusca, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnBusca, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnAdicionarCartao, GroupLayout.DEFAULT_SIZE, 28, Short.MAX_VALUE)
-						.addComponent(btnEditaCartao, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnRemoveCartao, GroupLayout.PREFERRED_SIZE, 28, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPaneTabela, GroupLayout.PREFERRED_SIZE, 412, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
->>>>>>> origin/master
 		);
 
 		scrollPaneTabela.setViewportView(table);
@@ -196,7 +150,6 @@ public class CartaoView extends JInternalFrame {
 		this.columnModel.getColumn(4).setPreferredWidth(90);
 		this.columnModel.getColumn(5).setPreferredWidth(90);
 	}
-<<<<<<< HEAD
 
 	private void buscarAction(java.awt.event.ActionEvent evt) {
 //		this.table.setModel(controllerDespesaReceita.buscar(
@@ -297,45 +250,17 @@ public class CartaoView extends JInternalFrame {
 		JOptionPane.showMessageDialog(null, msg, title, type);
 	}
 
-=======
-	
-	private void addCartaoView(){
-		adicionaCartao = new AdicionaCartao();
-		PrincipalView.getPainel().add(adicionaCartao);
-		adicionaCartao.setIconifiable(false);
-		adicionaCartao.setClosable(false);
-		adicionaCartao.moveToFront();
-	}
-	
-	private void edtCartaoView(){
-		editaCartao = new EditaCartao();
-		PrincipalView.getPainel().add(editaCartao);
-		editaCartao.setIconifiable(false);
-		editaCartao.setClosable(false);
-		editaCartao.moveToFront();
-	}
-	
->>>>>>> origin/master
 	public void setPosicao() {
 		Dimension d = this.getDesktopPane().getSize();
 		this.setLocation((d.width - this.getSize().width) / 2,
 				(d.height - this.getSize().height) / 2);
 	}
-<<<<<<< HEAD
 
 	private String NOME_TELA = "Cartão de crédito";
 	private String BTN_EDITAR = "Editar";
 	private String BTN_ADICIONAR = "Adicionar";
 	private String BTN_REMOVER = "Remover";
 	private String BTN_BUSCAR = "Buscar";
-=======
-	
-	private final String NOME_TELA = "Cartão de crédito";
-	private final String BTN_ADICIONAR = "Adicionar";
-	private final String BTN_EDITAR = "Editar";
-	private final String BTN_REMOVER = "Remover";
-	private final String BTN_BUSCA = "Buscar";
->>>>>>> origin/master
 	private String DICA_FIELD_BUSCAR = "Digite a descrição do cartão.";
 	private String ERRO_REMOVER = "Selecione um cartão para remover.";
 	private String ERRO_EDITAR = "Selecione um cartão para editar.";
@@ -343,7 +268,6 @@ public class CartaoView extends JInternalFrame {
 
 	private JButton btnRemoverCartao;
 	private JButton btnAdicionarCartao;
-<<<<<<< HEAD
 	private JButton btnEditarCartao;
 	private JScrollPane scrollPaneTabela;
 	private TableColumnModel columnModel;
@@ -357,14 +281,4 @@ public class CartaoView extends JInternalFrame {
 
 	protected static CartaoCreditoController controller;
 	private JMenuBar menuBar;
-=======
-	private JButton btnEditaCartao;
-	private JButton btnRemoveCartao;
-	private JButton btnBusca;
-	
-	private JScrollPane scrollPaneTabela;
-	
-	private AdicionaCartao adicionaCartao;
-	private EditaCartao editaCartao;
->>>>>>> origin/master
 }
