@@ -323,8 +323,9 @@ public class ReceitaView extends JInternalFrame {
 
 			else {
 				editReceitaView = controllerDespesaReceita
-						.abrirEditarReceitaView(table.getValueAt(
-								table.getSelectedRow(), 0));
+						.abrirEditarReceitaView(
+									table.getSelectedRow()
+								);
 				PrincipalView.getPainel().add(editReceitaView);
 				editReceitaView.setIconifiable(false);
 				editReceitaView.setClosable(false);
@@ -337,6 +338,7 @@ public class ReceitaView extends JInternalFrame {
 									InternalFrameEvent e) {
 								editReceitaView = null;
 								carregaTabela(comboMes.getSelectedIndex() + 1, fieldAno.getText());
+								comboSituacao.setSelectedIndex(0);
 							}
 						});
 

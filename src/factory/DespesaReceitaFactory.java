@@ -50,7 +50,7 @@ public abstract class DespesaReceitaFactory {
 		// LACO DE REPETICAO QUE IRA CRIAR AS DESPESAS/RECEITAS.
 		for (int i = 0, j = 0; i < parcelas; i++) {
 			if (cartaoCredito != null) {
-				dataVencimento = getDataVencimento(cartaoCredito, i + j);
+				dataVencimento = getDataVencimento(cartaoCredito, (i + j));
 
 				if (i == 0
 						&& verificaDataFechamento(dataVencimento, cartaoCredito)) {

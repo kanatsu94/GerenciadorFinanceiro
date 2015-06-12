@@ -336,8 +336,10 @@ public class DespesaView extends JInternalFrame {
 
 			else {
 				editDespesaView = controllerDespesaReceita
-						.abrirEditarDespesaView(table.getValueAt(
-								table.getSelectedRow(), 0));
+						.abrirEditarDespesaView(
+								table.getSelectedRow()
+								);
+				
 				PrincipalView.getPainel().add(editDespesaView);
 				editDespesaView.setIconifiable(false);
 				editDespesaView.setClosable(false);
@@ -351,6 +353,7 @@ public class DespesaView extends JInternalFrame {
 								editDespesaView = null;
 								carregaTabela(comboMes.getSelectedIndex() + 1,
 										fieldAno.getText());
+								comboSituacao.setSelectedIndex(0);
 							}
 						});
 

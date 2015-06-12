@@ -33,7 +33,7 @@ public class DespesaReceitaController {
 	private TipoDAO daoTipo;
 	private CategoriaDAO daoCategoria;
 	private ContaDAO daoConta;
-	
+
 	private CartaoCreditoController cartaoController;
 
 	private static String TITLE_ADD = "Nova ";
@@ -74,6 +74,9 @@ public class DespesaReceitaController {
 	private String totalDespesa;
 	private DecimalFormat df;
 
+	/*
+	 * INICIALIZACAO DAS VARIAVEIS NO CONSTRUTOR
+	 */
 	public DespesaReceitaController() {
 		this.msg = "";
 		this.dao = new DespesaReceitaDAO();
@@ -93,8 +96,10 @@ public class DespesaReceitaController {
 		this.cartaoController = new CartaoCreditoController();
 	}
 
-	// RECUPERA TODOS OS REGISTROS DE DESPESA/RECEITA DO
-	// BANCO DE DADOS E DEVOLVE UMA LIST.
+	/*
+	 * RECUPERA TODOS OS REGISTROS DE UM DETERMINADO
+	 * TIPO, NO BANCO DE DADOS.
+	 */
 	public List<DespesaReceita> listarTudo(Tipo t) {
 		List<DespesaReceita> lista;
 
@@ -102,20 +107,11 @@ public class DespesaReceitaController {
 
 		return lista;
 	}
-
-	// BUSCA TODAS AS DESPESAS/RECEITAS POR DESCRICAO.
-	@SuppressWarnings("deprecation")
-	public List<DespesaReceita> buscaDescricao(String descricao, Tipo tipo) {
-		List<DespesaReceita> lista;
-
-		DespesaReceita dr = new DespesaReceita();
-		dr.setDescricao(descricao);
-		dr.setTipoBean(tipo);
-		lista = dao.consultaDinamica(dr);
-
-		return lista;
-	}
-
+	
+	/*
+	 * CRIA A TABLE MODEL DE DESPESA OU RECEITA,
+	 * DE ACORDO COM OS PARAMETROS INFORMADOS.
+	 */
 	public DespesaReceitaTableModel buscar(int pago, String descricao,
 			int tipo, int mes, int ano) {
 		List<DespesaReceita> novaLista = new ArrayList<>();
@@ -167,7 +163,11 @@ public class DespesaReceitaController {
 			return new DespesaReceitaTableModel(this.listaReceita);
 		}
 	}
-
+	
+	/*
+	 * CRIA A TABLE MODEL DE RECEITA COM
+	 * OS PARAMETROS INFORMADOS.
+	 */
 	public DespesaReceitaTableModel getReceitaTableModel(int mes, int ano) {
 		this.listaReceita = listarTudo(RECEITA);
 		List<DespesaReceita> novaLista = new ArrayList<>();
@@ -175,24 +175,48 @@ public class DespesaReceitaController {
 		this.listaReceita.clear();
 
 		for (DespesaReceita r : novaLista) {
+			// VERIFICA SE O MES DE VENCIMENTO DA RECEITA E O MESMO
+			// MES QUE FOI SELECIONADO, E SE O ANO DA RECEITA E O
+			// MESMO QUE O ANO SELECIONADO.
 			if (r.getDataVencimento().getMonthOfYear() == mes
 					&& r.getDataVencimento().getYear() == ano) {
 				this.listaReceita.add(r);
-			} else if ((r.getDataVencimento().getMonthOfYear() < mes
+			}
+			/*
+			 * VERIFICA SE A DATA DE VENCIMENTO DA RECEITA E MENOR QUE A DATA
+			 * SELECIONADA SE FOR MENOR E A RECEITA FOR FIXA, ENTAO CRIAMOS A
+			 * RECEITA.
+			 */
+			else if ((r.getDataVencimento().getMonthOfYear() < mes
 					&& r.getDataVencimento().getYear() <= ano && r.getFixa())
 					|| (r.getDataVencimento().getYear() < ano && r.getFixa())) {
 
+				/*
+				 * UMA COPIA DA RECEITA E CRIADA, COM SEU VALOR DE FIXO SETADO
+				 * PARA FALSE. ISSO E FEITO PARA VERIFICAR SE ESSA JA FOI
+				 * DESMARCADA COMO FIXO.
+				 */
 				DespesaReceita nova = new DespesaReceita(r.getDescricao(),
 						r.getDataVencimento().withMonthOfYear(mes)
 								.withYear(ano), r.getValor());
+
 				nova.setCategoriaBean(r.getCategoriaBean());
 				nova.setFixa(false);
 				nova.setContaBean(r.getContaBean());
 
+				/*
+				 * EXECUTA A VERIFICACAO NA LISTA DE RECEITAS.
+				 */
 				if (!novaLista.contains(nova)) {
+					/*
+					 * SE NAO EXISTIR NENHUMA RECEITA COM FIXO FALSE, ENTAO
+					 * VOLTAMOS PARA TRUE E VERIFICAMOS SE ESSA RECEITA JA FOI
+					 * ADICIONADA A LISTA QUE IRA ALIMENTAR O TABLE MODEL.
+					 */
 					nova.setFixa(true);
-					if (!this.listaReceita.contains(nova)) {
-						nova.setCartaoCreditoBean(null);
+					if (!this.listaReceita.contains(nova)
+							&& !comparaPorDataVencimento(novaLista, nova)) {
+						nova.setCartaoCreditoBean(r.getCartaoCreditoBean());
 						nova.setDataMovimentacao(null);
 						nova.setParcelaId(null);
 						nova.setTipoBean(RECEITA);
@@ -221,6 +245,10 @@ public class DespesaReceitaController {
 		return new DespesaReceitaTableModel(this.listaReceita);
 	}
 
+	/*
+	 * CRIA A TABLE MODEL DE DESPESA COM
+	 * OS PARAMETROS INFORMADOS.
+	 */
 	public DespesaReceitaTableModel getDespesaTableModel(int mes, int ano) {
 		this.listaDespesa = listarTudo(DESPESA);
 		List<DespesaReceita> novaLista = new ArrayList<>();
@@ -298,6 +326,10 @@ public class DespesaReceitaController {
 		return new DespesaReceitaTableModel(this.listaDespesa);
 	}
 
+	/*
+	 * VERIFICA SE UMA DESPESA/RECEITA E IGUAL
+	 * CONSIDERANDO A DATA DE VENCIMENTO
+	 */
 	private boolean comparaPorDataVencimento(List<DespesaReceita> lista,
 			DespesaReceita dr) {
 		for (DespesaReceita deRe : lista) {
@@ -308,15 +340,23 @@ public class DespesaReceitaController {
 		return false;
 	}
 
+	/*
+	 * RETORNA O TOTAL DOS VALORES DAS RECEITA
+	 */
 	public String getTotalReceita() {
 		return this.totalReceita.toString();
 	}
 
+	/*
+	 * RETORNA O TOTAL DOS VALORES DAS DESPESAS
+	 */
 	public String getTotalDespesa() {
 		return this.totalDespesa.toString();
 	}
 
-	// SALVA UMA DESPESA/RECEITA
+	/*
+	 * SALVA UMA DESPESA OU RECEITA.
+	 */
 	public boolean salvar(String descricao, Date dataVencimento,
 			Date dataMovimentacao, String valor, boolean fixa,
 			Object categoria, int tipoId, Object conta, Object cartaoCredito,
@@ -335,11 +375,14 @@ public class DespesaReceitaController {
 				pago, cartaoCredito)) {
 			LocalDate movimentacao = null;
 			this.title = tipo.getDescricao();
-			
+
 			if (parcelas.equals(""))
 				parcelas = "1";
 			if (dataMovimentacao != null)
 				movimentacao = new LocalDate(dataMovimentacao);
+			if (cartaoCredito != null)
+				if (((CartaoCredito) cartaoCredito).getId() == 0)
+					cartaoCredito = null;
 
 			ArrayList<String> erros = DespesaReceitaFactory.novaDespesaReceita(
 					descricao, new LocalDate(dataVencimento), movimentacao,
@@ -367,7 +410,10 @@ public class DespesaReceitaController {
 		return flag;
 	}
 
-	// VALIDACAO DOS CAMPOS
+	/*
+	 * VERIFICA SE EXISTEM CAMPOS OBRIGATORIOS
+	 * QUE NAO FORAM PREENCHIDOS.
+	 */
 	private boolean validaCampos(String descricao, Date dataVencimento,
 			Date dataMovimentacao, String valor, boolean pago,
 			Object cartaoCredito) {
@@ -406,32 +452,36 @@ public class DespesaReceitaController {
 		return retorno;
 	}
 
-	// REMOVE DESPESA/RECEITA
+	/*
+	 * REMOVE UMA DESPESA OU RECEITA.
+	 */
 	public boolean remover(Object id, int tipo) {
 		boolean flag = false;
 		Tipo t;
-		
-		
-		if(tipo == 1)
+
+		if (tipo == 1)
 			t = DESPESA;
 		else
 			t = RECEITA;
-		
+
 		if ((int) id == 0) {
 			this.title = TITLE_REMOVER;
-			this.msg = REMOVER_ID_0 + t.getDescricao().toLowerCase() + " criada automaticamente.";
+			this.msg = REMOVER_ID_0 + t.getDescricao().toLowerCase()
+					+ " criada automaticamente.";
 			this.type = 2;
 			ExibeMensagem.showMessage(this.msg, this.title, this.type);
 		}
-		
+
 		else {
 			DespesaReceita dr = dao.procurar((int) id);
 			int num = 1;
 
 			this.title = TITLE_REMOVER + t.getDescricao();
 			this.msg = REMOVER_CONFIRMACAO;
+			this.type = 0;
 
-			if (ExibeMensagem.showQuestionMessage(this.msg, this.title, this.type) == 0) {
+			if (ExibeMensagem.showQuestionMessage(this.msg, this.title,
+					this.type) == 0) {
 				flag = true;
 
 				this.title = TITLE_REMOVER + t.getDescricao();
@@ -443,7 +493,8 @@ public class DespesaReceitaController {
 
 				if (dr.getParcelaId() != null
 						&& dr.getDataMovimentacao() == null
-						&& ExibeMensagem.showQuestionMessage(this.msg, this.title, this.type) == 0) {
+						&& ExibeMensagem.showQuestionMessage(this.msg,
+								this.title, this.type) == 0) {
 
 					num = dao.removerPorParcelaId(dr.getParcelaId());
 
@@ -478,7 +529,9 @@ public class DespesaReceitaController {
 		return flag;
 	}
 
-	// ATUALIZA UMA DESPESA / RECEITA
+	/*
+	 * ATUALIZA UMA DESPESA OU RECEITA.
+	 */
 	public boolean atualizar(String descricao, Date dataVencimento,
 			Date dataMovimentacao, String valor, boolean fixa,
 			Object categoria, Object conta, Object cartaoCredito, boolean pago,
@@ -503,9 +556,9 @@ public class DespesaReceitaController {
 			dr.setFixa(fixa);
 			dr.setCategoriaBean((Categoria) categoria);
 			dr.setContaBean((Conta) conta);
-			if(((CartaoCredito) cartaoCredito).getId() <= 0){
+			if (((CartaoCredito) cartaoCredito).getId() <= 0) {
 				dr.setCartaoCreditoBean(null);
-			}else
+			} else
 				dr.setCartaoCreditoBean((CartaoCredito) cartaoCredito);
 
 			LocalDate movimentacao;
@@ -528,7 +581,8 @@ public class DespesaReceitaController {
 			// E CASO EXISTA, PERGUNTA SE QUER PROPAGAR A ALTERACAO.
 			if (dr.getParcelaId() != null
 					&& dao.procurar(dr.getId()).getDataMovimentacao() == null
-					&& ExibeMensagem.showQuestionMessage(this.msg, this.title, this.type) == 0)
+					&& ExibeMensagem.showQuestionMessage(this.msg, this.title,
+							this.type) == 0)
 
 				flag = dao.atualizarPorParcelaId(dr);
 
@@ -555,90 +609,85 @@ public class DespesaReceitaController {
 		}
 		return flag;
 	}
-	
+
 	/*
 	 * ATUALIZA UMA DESPESA/RECEITA SEM REALIZAR VERIFICACOES.
 	 */
-	public boolean atualizarSemVerificao(DespesaReceita dr){
+	public boolean atualizarSemVerificao(DespesaReceita dr) {
 		return this.dao.atualizar(dr);
 	}
 
-	public EditarReceitaView abrirEditarReceitaView(Object id) {
-		EditarReceitaView editarReceitaView;
+	/*
+	 * CRIA A TELA DE EDICAO DE RECEITA
+	 */
+	public EditarReceitaView abrirEditarReceitaView(int linha) {
+		EditarReceitaView editarReceitaView = new EditarReceitaView();
 
-		for (DespesaReceita dr : listaReceita) {
-			if (dr.getId() == (int) id) {
-				editarReceitaView = new EditarReceitaView();
+		DespesaReceita dr = listaReceita.get(linha);
 
-				JComboBox comboConta = getComboConta();
-				comboConta.setSelectedItem(dr.getContaBean());
-				JComboBox comboCategoria = getComboCategoriaReceita();
-				comboCategoria.setSelectedItem(dr.getCategoriaBean());
-				editarReceitaView.setCod(dr.getId());
-				editarReceitaView.setDescricao(dr.getDescricao());
-				editarReceitaView.setConta(comboConta);
-				editarReceitaView.setCategoria(comboCategoria);
-				editarReceitaView.setValor(dr.getValor());
-				editarReceitaView.setReceitaFixa(dr.getFixa());
-				editarReceitaView.setDataVencimento(dr.getDataVencimento());
-				if (dr.getDataMovimentacao() != null) {
-					editarReceitaView.setPago(true);
-					editarReceitaView
-							.setDataPagamento(dr.getDataMovimentacao());
-				} else {
-					editarReceitaView.setPago(false);
-				}
+		JComboBox comboConta = getComboConta();
+		comboConta.setSelectedItem(dr.getContaBean());
+		JComboBox comboCategoria = getComboCategoriaReceita();
+		comboCategoria.setSelectedItem(dr.getCategoriaBean());
 
-				return editarReceitaView;
-			}
+		editarReceitaView.setCod(dr.getId());
+		editarReceitaView.setDescricao(dr.getDescricao());
+		editarReceitaView.setConta(comboConta);
+		editarReceitaView.setCategoria(comboCategoria);
+		editarReceitaView.setValor(dr.getValor());
+		editarReceitaView.setReceitaFixa(dr.getFixa());
+		editarReceitaView.setDataVencimento(dr.getDataVencimento());
+		if (dr.getDataMovimentacao() != null) {
+			editarReceitaView.setPago(true);
+			editarReceitaView.setDataPagamento(dr.getDataMovimentacao());
+		} else {
+			editarReceitaView.setPago(false);
 		}
 
-		return null;
+		return editarReceitaView;
 	}
 
-	public EditarDespesaView abrirEditarDespesaView(Object id) {
-		EditarDespesaView editarDespesaView;
+	/*
+	 * CRIA A TELA DE EDICAO DE DESPESA
+	 */
+	public EditarDespesaView abrirEditarDespesaView(int linha) {
+		EditarDespesaView editarDespesaView = new EditarDespesaView();
 
-		for (DespesaReceita dr : listaDespesa) {
-			if (dr.getId() == (int) id) {
-				editarDespesaView = new EditarDespesaView();
+		DespesaReceita dr = listaDespesa.get(linha);
 
-				JComboBox comboConta = getComboConta();
-				comboConta.setSelectedItem(dr.getContaBean());
+		JComboBox comboConta = getComboConta();
+		comboConta.setSelectedItem(dr.getContaBean());
 
-				JComboBox comboCategoria = getComboCategoriaDespesa();
-				comboCategoria.setSelectedItem(dr.getCategoriaBean());
+		JComboBox comboCategoria = getComboCategoriaDespesa();
+		comboCategoria.setSelectedItem(dr.getCategoriaBean());
 
-				JComboBox comboCartao = getComboCartaoCredito();
-				if(dr.getCartaoCreditoBean() != null)
-					comboCartao.setSelectedItem(dr.getCartaoCreditoBean());
-				else
-					comboCartao.setSelectedIndex(0);
+		JComboBox comboCartao = getComboCartaoCredito();
+		if (dr.getCartaoCreditoBean() != null)
+			comboCartao.setSelectedItem(dr.getCartaoCreditoBean());
+		else
+			comboCartao.setSelectedIndex(0);
 
-				editarDespesaView.setCod(dr.getId());
-				editarDespesaView.setDescricao(dr.getDescricao());
-				editarDespesaView.setConta(comboConta);
-				editarDespesaView.setCategoria(comboCategoria);
-				editarDespesaView.setCartao(comboCartao);
-				editarDespesaView.setValor(dr.getValor());
-				editarDespesaView.setDespesaFixa(dr.getFixa());
-				editarDespesaView.setDataVencimento(dr.getDataVencimento());
-				if (dr.getDataMovimentacao() != null) {
-					editarDespesaView.setPago(true);
-					editarDespesaView
-							.setDataPagamento(dr.getDataMovimentacao());
-				} else {
-					editarDespesaView.setPago(false);
-				}
-
-				return editarDespesaView;
-			}
+		editarDespesaView.setCod(dr.getId());
+		editarDespesaView.setDescricao(dr.getDescricao());
+		editarDespesaView.setConta(comboConta);
+		editarDespesaView.setCategoria(comboCategoria);
+		editarDespesaView.setCartao(comboCartao);
+		editarDespesaView.setValor(dr.getValor());
+		editarDespesaView.setDespesaFixa(dr.getFixa());
+		editarDespesaView.setDataVencimento(dr.getDataVencimento());
+		if (dr.getDataMovimentacao() != null) {
+			editarDespesaView.setPago(true);
+			editarDespesaView.setDataPagamento(dr.getDataMovimentacao());
+		} else {
+			editarDespesaView.setPago(false);
 		}
 
-		return null;
+		return editarDespesaView;
 	}
 
-	// CRIA O JCOMBOBOX DE CONTA
+	/*
+	 *  CRIA O JCOMBOBOX DE CONTA
+	 */
 	public JComboBox<Conta> getComboConta() {
 		JComboBox<Conta> combo = new JComboBox<Conta>();
 
@@ -652,7 +701,9 @@ public class DespesaReceitaController {
 		return combo;
 	}
 
-	// CRIA O JCOMBOBOX DE CATEGORIA DE DESPESA
+	/*
+	 *  CRIA O JCOMBOBOX DE CATEGORIA DE DESPESA
+	 */
 	public JComboBox<Categoria> getComboCategoriaDespesa() {
 		JComboBox<Categoria> combo = new JComboBox<Categoria>();
 
@@ -667,7 +718,9 @@ public class DespesaReceitaController {
 		return combo;
 	}
 
-	// CRIA O JCOMBOBOX DE CATEGORIA DE RECEITA
+	/*
+	 *  CRIA O JCOMBOBOX DE CATEGORIA DE RECEITA
+	 */
 	public JComboBox<Categoria> getComboCategoriaReceita() {
 		JComboBox<Categoria> combo = new JComboBox<Categoria>();
 
@@ -681,9 +734,13 @@ public class DespesaReceitaController {
 
 		return combo;
 	}
-	
-	public JComboBox<CartaoCredito> getComboCartaoCredito(){
+
+	/*
+	 * UTILIZA O CONTROLLER DE CARTAO DE CREDITO PARA RECUPERAR
+	 * UM COMBOBOX DE CARTAO DE CREDITO.
+	 */
+	public JComboBox<CartaoCredito> getComboCartaoCredito() {
 		return cartaoController.getComboCartaoCredito();
 	}
-	
+
 }
