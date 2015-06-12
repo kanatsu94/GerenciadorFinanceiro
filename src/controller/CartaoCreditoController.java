@@ -2,16 +2,19 @@ package controller;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JComboBox;
 
-import org.joda.time.LocalDate;
-
 import model.CartaoCredito;
 import model.DespesaReceita;
+
+import org.joda.time.LocalDate;
+
 import table.CartaoCreditoTableModel;
 import util.ExibeMensagem;
+import view.EditarCartaoView;
 import dao.CartaoCreditoDAO;
 import factory.CartaoCreditoFactory;
 
@@ -36,6 +39,8 @@ public class CartaoCreditoController {
 	private static String TITLE = "Cartão de Crédito";
 	private static String TITLE_EFETIVAR_ERRO = "Efetivar Cartão de Crédito - Erro";
 	private static String TITLE_EFETIVAR = "Efetivar Cartão de Crédito";
+	private static String TITLE_DESATIVAR = "Cartão de Crédito - Desativar";
+	private static String TITLE_ATUALIZAR = "Cartão de Crédito - Atualizar";
 	private static String MSG_ERRO_VALIDACAO = "Você precisa fornecer as seguintes informações:\n\n";
 	private static String MSG_SALVAR_SUCESSO = "Cartão de crédito salvo com sucesso!";
 	private static String MSG_EFETIVAR_VAZIO = "Não existem despesas nesta fatura!";
@@ -43,24 +48,51 @@ public class CartaoCreditoController {
 	private static String MSG_EFETIVAR_ERRO_PT2 = ".\nDespesas efetivadas: ";
 	private static String MSG_EFETIVAR_SUCESSO = " despesa(s) efetivada(s) com sucesso!";
 	private static String MSG_EFETIVAR_ERRO_DATA = "Não é possível efetivar.\n\nEsta fatura ainda não está fechada.";
+	private static String MSG_DESATIVAR_SUCESSO = "O cartão foi desativado com sucesso!\n\n"
+			+ "As despesas que estiverem associadas a este cartão, continuarão associadas a ele.";
+	private static String MSG_DESATIVAR_ERRO = "Ocorreu um erro ao tentar desativar o cartão.";
 	private static String QUESTION_EFETIVAR = "Deseja mesmo efetivar?";
+	private static String QUESTION_DESATIVAR = "Tem certeza que deseja desativar este cartão?";
+	private static String MSG_ATUALIZAR_SUCESSO = "Cartão de Crédito atualizado com sucesso!";
+	private static String MSG_ATUALIZAR_ERRO = "Ocorreu um erro ao tentar atualizar o cartão de crédito.";
 
+	/*
+	 * INICIALIZA AS VARIAVEIS NO CONSTRUTOR
+	 */
 	public CartaoCreditoController() {
 		this.dao = new CartaoCreditoDAO();
 		this.msg = "";
 		this.type = 0;
 		this.title = "";
 		this.df = new DecimalFormat("#,##0.00");
-		this.listaCartaoCredito = null;
+		this.listaCartaoCredito = dao.listaAtivos();
 		this.listaDespesaFatura = new ArrayList<>();
 	}
 
-	public CartaoCreditoTableModel getTableModel() {
-		List<CartaoCredito> lista = dao.listaTudo();
+	/*
+	 * RETORNA O TABLE MODEL DE CARTAO DE CREDITO.
+	 */
+	public CartaoCreditoTableModel getTableModel(String descricao) {
+		List<CartaoCredito> nova = new ArrayList<>();
+		descricao = descricao.toLowerCase();
+		nova.addAll(dao.listaAtivos());
 
-		return new CartaoCreditoTableModel(lista);
+		if (!this.listaCartaoCredito.isEmpty())
+			this.listaCartaoCredito.clear();
+
+		for (CartaoCredito c : nova) {
+			if (c.getDescricao().toLowerCase().contains(descricao))
+				this.listaCartaoCredito.add(c);
+		}
+
+		Collections.sort(this.listaCartaoCredito);
+
+		return new CartaoCreditoTableModel(listaCartaoCredito);
 	}
 
+	/*
+	 * CRIA E SALVA UM CARTAO DE CREDITO NO BANCO DE DADOS.
+	 */
 	public boolean salvar(String descricao, String diaVencimento,
 			String diaFechamento) {
 		boolean flag = true;
@@ -69,6 +101,7 @@ public class CartaoCreditoController {
 		 * FAZ A VALIDACAO DOS CAMPOS ANTES DE TENTAR SALVAR.
 		 */
 		if (validaCampos(descricao, diaVencimento, diaFechamento)) {
+			this.msg = "";
 
 			/*
 			 * O METODO DE CRIAR CARTAO RETORNA UMA LISTA DE ERROS.
@@ -106,7 +139,9 @@ public class CartaoCreditoController {
 		return flag;
 	}
 
-	// VERIFICA SE DADOS OBRIGATORIOS NAO FORAM INFORMADOS
+	/*
+	 * VERIFICA SE DADOS OBRIGATORIOS NAO FORAM INFORMADOS
+	 */
 	private boolean validaCampos(String descricao, String diaVencimento,
 			String diaFechamento) {
 		boolean retorno = true;
@@ -121,9 +156,11 @@ public class CartaoCreditoController {
 		}
 		if (diaVencimento.isEmpty()) {
 			this.msg = msg + CartaoCreditoController.NULL_DIA_VENC;
+			retorno = false;
 		}
 		if (diaFechamento.isEmpty()) {
 			this.msg = msg + CartaoCreditoController.NULL_DIA_FECH;
+			retorno = false;
 		}
 
 		if (!retorno) {
@@ -131,6 +168,80 @@ public class CartaoCreditoController {
 		}
 
 		return retorno;
+	}
+
+	/*
+	 * DESATIVA UM CARTAO DE CREDITO. O CARTAO NAO SERA REMOVIDO, POIS PODEMOS
+	 * TER DESPESAS ASSOCIADAS A ELE.
+	 */
+	public boolean desativar(Object id) {
+		boolean flag = true;
+
+		if (ExibeMensagem.showQuestionMessage(QUESTION_DESATIVAR,
+				TITLE_DESATIVAR, 0) == 0) {
+			CartaoCredito desativar = dao.procurar((int) id);
+			desativar.setAtivo(false);
+			if (dao.atualizar(desativar)) {
+				ExibeMensagem.showMessage(MSG_DESATIVAR_SUCESSO,
+						TITLE_DESATIVAR, 1);
+			} else {
+				flag = false;
+				ExibeMensagem.showMessage(MSG_DESATIVAR_ERRO, TITLE_DESATIVAR,
+						0);
+			}
+		} else {
+			flag = false;
+		}
+
+		return flag;
+	}
+
+	/*
+	 * ATUALIZA UM CARTAO DE CREDITO.
+	 */
+	public boolean atualizar(String descricao, String diaVencimento,
+			String diaFechamento, int cod) {
+		boolean flag = true;
+
+		if (validaCampos(descricao, diaVencimento, diaFechamento)) {
+			ArrayList<String> erros = CartaoCreditoFactory.validarDados(
+					(short) Integer.parseInt(diaVencimento),
+					(short) Integer.parseInt(diaFechamento));
+
+			if (erros.size() == 1) {
+				CartaoCredito atualizar = dao.procurar(cod);
+
+				atualizar.setDescricao(descricao);
+				atualizar
+						.setVencimento((short) Integer.parseInt(diaVencimento));
+				atualizar.setDiasFechamento((short) Integer
+						.parseInt(diaFechamento));
+
+				if (dao.atualizar(atualizar)) {
+					ExibeMensagem.showMessage(MSG_ATUALIZAR_SUCESSO,
+							TITLE_ATUALIZAR, 1);
+				} else {
+					flag = false;
+					ExibeMensagem.showMessage(MSG_ATUALIZAR_ERRO,
+							TITLE_ATUALIZAR, 0);
+				}
+			} else {
+				flag = false;
+
+				this.msg = "";
+				this.type = 0;
+				this.title = TITLE_ATUALIZAR;
+				for (String s : erros) {
+					this.msg = this.msg + s + "\n";
+				}
+				
+				ExibeMensagem.showMessage(this.msg, this.title, this.type);
+			}
+		} else {
+			flag = false;
+		}
+
+		return flag;
 	}
 
 	/*
@@ -176,7 +287,9 @@ public class CartaoCreditoController {
 		return resumo;
 	}
 
-	// EFETIVA AS DESPESAS DO MES E ANO SELECIONADOS.
+	/*
+	 * EFETIVA AS DESPESAS DO MES E ANO SELECIONADOS.
+	 */
 	public boolean efetivarCartao(Object cartao, int mes, int ano) {
 		DespesaReceitaController despesaReceitaController = new DespesaReceitaController();
 		int count = 0;
@@ -214,19 +327,37 @@ public class CartaoCreditoController {
 		return false;
 	}
 
-	// CRIA O JCOMBOBOX DE CARTAO DE CREDITO
-	public JComboBox<CartaoCredito> getComboCartaoCredito() {
+	/*
+	 * CRIA A TELA DE EDICAO DE CARTAO DE CREDITO.
+	 */
+	public EditarCartaoView abrirEditarCartaoView(int linha) {
+		EditarCartaoView view = new EditarCartaoView();
+
+		CartaoCredito editar = this.listaCartaoCredito.get(linha);
+
+		view.setCod(editar.getId());
+		view.setDescricao(editar.getDescricao());
+		view.setDiaVencimento("" + editar.getVencimento());
+		view.setDiasFechamento("" + editar.getDiasFechamento());
+
+		return view;
+	}
+
+	/*
+	 * CRIA O JCOMBOBOX DE CARTAO DE CREDITO
+	 */
+	public JComboBox<CartaoCredito> getComboCartaoCredito(boolean ativo) {
 		JComboBox<CartaoCredito> combo = new JComboBox<CartaoCredito>();
 		CartaoCredito selecione = new CartaoCredito("Selecione...", (short) 0,
 				(short) 0);
 
-		if (this.listaCartaoCredito == null)
-			listaCartaoCredito = dao.listaTudo();
+		listaCartaoCredito = dao.listaTudo();
 
 		combo.addItem(selecione);
 
 		for (CartaoCredito cd : listaCartaoCredito) {
-			combo.addItem(cd);
+			if (cd.getAtivo())
+				combo.addItem(cd);
 		}
 
 		return combo;

@@ -53,7 +53,7 @@ import javax.swing.event.ChangeListener;
 import org.jdatepicker.DateModel;
 import org.jdatepicker.JDatePanel;
 import org.jdatepicker.JDatePicker;
-import org.jdatepicker.impl.JDatePanelImpl;
+import util.JDatePanelImpl;
 
 
 /**

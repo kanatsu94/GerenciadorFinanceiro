@@ -650,10 +650,12 @@ public class DespesaReceitaController {
 	/*
 	 * CRIA A TELA DE EDICAO DE DESPESA
 	 */
+	@SuppressWarnings("unchecked")
 	public EditarDespesaView abrirEditarDespesaView(int linha) {
 		EditarDespesaView editarDespesaView = new EditarDespesaView();
 
 		DespesaReceita dr = listaDespesa.get(linha);
+		dr = dao.procurar(dr.getId());
 
 		JComboBox comboConta = getComboConta();
 		comboConta.setSelectedItem(dr.getContaBean());
@@ -661,9 +663,15 @@ public class DespesaReceitaController {
 		JComboBox comboCategoria = getComboCategoriaDespesa();
 		comboCategoria.setSelectedItem(dr.getCategoriaBean());
 
-		JComboBox comboCartao = getComboCartaoCredito();
-		if (dr.getCartaoCreditoBean() != null)
-			comboCartao.setSelectedItem(dr.getCartaoCreditoBean());
+		JComboBox comboCartao = getComboCartaoCredito(true);
+		if (dr.getCartaoCreditoBean() != null){
+			if(dr.getCartaoCreditoBean().getAtivo())
+				comboCartao.setSelectedItem(dr.getCartaoCreditoBean());
+			else{
+				comboCartao.addItem(dr.getCartaoCreditoBean());
+				comboCartao.setSelectedIndex(comboCartao.getItemCount()-1);
+			}
+		}
 		else
 			comboCartao.setSelectedIndex(0);
 
@@ -739,8 +747,8 @@ public class DespesaReceitaController {
 	 * UTILIZA O CONTROLLER DE CARTAO DE CREDITO PARA RECUPERAR
 	 * UM COMBOBOX DE CARTAO DE CREDITO.
 	 */
-	public JComboBox<CartaoCredito> getComboCartaoCredito() {
-		return cartaoController.getComboCartaoCredito();
+	public JComboBox<CartaoCredito> getComboCartaoCredito(boolean ativo) {
+		return cartaoController.getComboCartaoCredito(ativo);
 	}
 
 }

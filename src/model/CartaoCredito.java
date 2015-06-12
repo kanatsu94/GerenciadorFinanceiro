@@ -9,6 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -22,18 +23,25 @@ import org.joda.time.LocalDate;
  */
 @Entity
 @Table(name = "cartao_credito")
-@NamedQuery(name = CartaoCredito.LISTAR_TUDO, query = "SELECT c FROM CartaoCredito c")
-public class CartaoCredito implements Serializable {
+@NamedQueries({
+	@NamedQuery(name = CartaoCredito.LISTAR_TUDO, query = "SELECT c FROM CartaoCredito c"),
+	@NamedQuery(name = CartaoCredito.LISTAR_ATIVOS, query="SELECT c FROM CartaoCredito c WHERE c.ativo = true")
+})
+public class CartaoCredito implements Serializable, Comparable<CartaoCredito> {
 	private static final long serialVersionUID = 1L;
 
 	@Transient
 	public static final String LISTAR_TUDO = "CartaoCredito.findAll";
+	@Transient
+	public static final String LISTAR_ATIVOS = "CartaoCredito.findByAtivo";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
 	private String descricao;
+	
+	private boolean ativo;
 
 	// DIA DO MES EM QUE A FATURA VENCE
 	private short vencimento;
@@ -78,6 +86,10 @@ public class CartaoCredito implements Serializable {
 	public short getDiasFechamento() {
 		return this.diasFechamento;
 	}
+	
+	public boolean getAtivo(){
+		return this.ativo;
+	}
 
 	public List<DespesaReceita> getDespesaReceitas() {
 		return this.despesaReceitas;
@@ -87,12 +99,17 @@ public class CartaoCredito implements Serializable {
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
 	}
+	
+	public void setAtivo(boolean ativo){
+		this.ativo = ativo;
+	}
 
 	public void setVencimento(short vencimento) {
 		this.vencimento = vencimento;
 		if (this.despesaReceitas != null)
 			for (DespesaReceita dr : this.despesaReceitas) {
-				dr.atualizaVencimento(vencimento);
+				if(dr.getDataMovimentacao() == null)
+					dr.atualizaVencimento(vencimento);
 			}
 	}
 
@@ -188,4 +205,9 @@ public class CartaoCredito implements Serializable {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public int compareTo(CartaoCredito outra) {
+		return this.descricao.compareTo(outra.getDescricao());
+	  }
 }

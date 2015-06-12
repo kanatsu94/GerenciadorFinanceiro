@@ -68,7 +68,7 @@ public class EfetivarCartaoView extends JInternalFrame {
 		this.lblAno = new JLabel(LBL_ANO);
 		getContentPane().add(lblAno, "cell 11 0 2 1");
 
-		this.comboCartao = controller.getComboCartaoCredito();
+		this.comboCartao = controller.getComboCartaoCredito(true);
 		// this.comboCartao = new JComboBox();
 		getContentPane().add(comboCartao, "cell 0 1 7 1,growx,aligny center");
 		this.comboCartao.addItemListener(new ItemListener() {

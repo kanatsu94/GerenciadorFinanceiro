@@ -6,9 +6,9 @@ import dao.CartaoCreditoDAO;
 import model.CartaoCredito;
 
 public abstract class CartaoCreditoFactory {
-	private static String ERRO_VALIDACAO = "Você forneceu valores inválidos:\n\n";
-	private static String ERRO_DIA_VENCIMENTO = "- Dia de vencimento inválido. Informe um valor entre 1 e 31.";
-	private static String ERRO_DIA_FECHAMENTO = "- Dia de fechamento inválido. Informe um valor entre 1 e 31.";
+	private static String ERRO_VALIDACAO = "Você forneceu valores inválidos:\n";
+	private static String ERRO_DIA_VENCIMENTO = "- Dia de vencimento inválido. Informe um valor entre 1 e 31.\n";
+	private static String ERRO_DIA_FECHAMENTO = "- Dias para fechamento da fatura inválido. Informe um valor entre 1 e 31.\n";
 	private static String ERRO_SALVAR = "Ocorreu um erro ao salvar o cartão de crédito.";
 
 	public static ArrayList<String> novoCartaoCredito(String descricao,
@@ -33,7 +33,7 @@ public abstract class CartaoCreditoFactory {
 		}
 	}
 
-	private static ArrayList<String> validarDados(short diaVencimento,
+	public static ArrayList<String> validarDados(short diaVencimento,
 			short diaFechamento) {
 		ArrayList<String> erros = new ArrayList<>();
 

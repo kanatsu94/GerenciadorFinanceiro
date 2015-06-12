@@ -7,9 +7,6 @@ import javax.swing.table.AbstractTableModel;
 
 import model.CartaoCredito;
 
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
 public class CartaoCreditoTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
 
@@ -61,7 +58,6 @@ public class CartaoCreditoTableModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		CartaoCredito cartaocredito = linhas.get(rowIndex);
-		DateTimeFormatter dataFormat = DateTimeFormat.forPattern("dd/MM/yyyy");
 
 		// RETORNA O CAMPO REFERENTE A COLUNA ESPECIFICADA.
 		// AQUI E FEITO UM SWITCH PARA VERIFICAR QUAL E A COLUNA
@@ -73,9 +69,9 @@ public class CartaoCreditoTableModel extends AbstractTableModel {
 		case 1:
 			return cartaocredito.getDescricao();
 		case 2:
-			return dataFormat.print(cartaocredito.getVencimento());
+			return cartaocredito.getVencimento();
 		case 3:
-			return dataFormat.print(cartaocredito.getDiasFechamento());
+			return cartaocredito.getDiasFechamento();
 		default:
 			// ISTO NAO DEVERIA ACONTECER...
 			throw new IndexOutOfBoundsException(

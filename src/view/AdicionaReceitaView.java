@@ -18,7 +18,7 @@ import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 
-import org.jdatepicker.impl.JDatePanelImpl;
+import util.JDatePanelImpl;
 import org.jdatepicker.impl.UtilDateModel;
 
 import util.DateLabelFormatter;
@@ -61,6 +61,8 @@ public class AdicionaReceitaView extends JInternalFrame {
 		this.pickerPagamento = new JDatePickerImpl(panelPagamento,
 				new DateLabelFormatter());
 
+		this.panelVencimento.setShowYearButtons(true);
+		this.panelPagamento.setShowYearButtons(true);
 		this.pickerPagamento.setButtonEnable(false);
 
 		this.lblDescricao = new JLabel(LBL_DESCRICAO);
@@ -89,6 +91,7 @@ public class AdicionaReceitaView extends JInternalFrame {
 
 		this.fieldValor.setDocument(new DecimalFieldDocument());
 		this.fieldRepetir.setDocument(new NumberFieldDocument());
+		// O TAMANHO MAXIMO DA STRING E 150 [ VARCHAR(150) ]
 		this.fieldDescricao.setDocument(new TextFieldDocument(150));
 
 		this.btnCancelar = new JButton(BTN_CANCELAR);

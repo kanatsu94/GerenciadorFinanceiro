@@ -18,7 +18,7 @@ import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 
-import org.jdatepicker.impl.JDatePanelImpl;
+import util.JDatePanelImpl;
 import org.jdatepicker.impl.UtilDateModel;
 
 import util.DateLabelFormatter;
@@ -57,6 +57,9 @@ public class AdicionaDespesaView extends JInternalFrame {
 		this.panelVencimento = new JDatePanelImpl(this.modelVencimento, this.p);
 		this.panelPagamento = new JDatePanelImpl(this.modelPagamento, this.p);
 
+		this.panelVencimento.setShowYearButtons(true);
+		this.panelPagamento.setShowYearButtons(true);
+
 		this.lblDescricao = new JLabel(LBL_DESCRICAO);
 		this.lblValor = new JLabel(LBL_VALOR);
 
@@ -70,6 +73,7 @@ public class AdicionaDespesaView extends JInternalFrame {
 		this.fieldValor.setColumns(10);
 
 		this.fieldValor.setDocument(new DecimalFieldDocument());
+		// O TAMANHO MAXIMO DA STRING E 150 [ VARCHAR(150) ]
 		this.fieldDescricao.setDocument(new TextFieldDocument(150));
 
 		getContentPane()
@@ -127,7 +131,7 @@ public class AdicionaDespesaView extends JInternalFrame {
 				"cell 12 9 11 1,growx,aligny center");
 
 		this.comboCartao = DespesaView.controllerDespesaReceita
-				.getComboCartaoCredito();
+				.getComboCartaoCredito(true);
 		comboCartao.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent arg0) {
 				if(comboCartao.getSelectedIndex() > 0){

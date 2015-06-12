@@ -18,7 +18,7 @@ import javax.swing.SwingConstants;
 
 import net.miginfocom.swing.MigLayout;
 
-import org.jdatepicker.impl.JDatePanelImpl;
+import util.JDatePanelImpl;
 import org.jdatepicker.impl.UtilDateModel;
 import org.joda.time.LocalDate;
 
@@ -59,6 +59,9 @@ public class EditarDespesaView extends JInternalFrame {
 
 		this.modelPagamento = new UtilDateModel();
 		this.panelPagamento = new JDatePanelImpl(this.modelPagamento, this.p);
+		
+		this.panelVencimento.setShowYearButtons(true);
+		this.panelPagamento.setShowYearButtons(true);
 
 		this.lblValor = new JLabel(LBL_VALOR);
 		this.lblCod = new JLabel(LBL_COD);
@@ -69,6 +72,7 @@ public class EditarDespesaView extends JInternalFrame {
 		this.fieldCod = new JTextField();
 
 		this.fieldValor.setDocument(new DecimalFieldDocument());
+		// O TAMANHO MAXIMO DA STRING E 150 [ VARCHAR(150) ]
 		this.fieldDescricao.setDocument(new TextFieldDocument(150));
 
 		this.btnCancelar = new JButton(BTN_CANCELAR);
