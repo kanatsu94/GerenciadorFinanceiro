@@ -200,7 +200,9 @@ public class DespesaReceitaController {
 					nova.setCategoriaBean(r.getCategoriaBean());
 					nova.setContaBean(r.getContaBean());
 					nova.setTipoBean(RECEITA);
-
+					nova.setFixa(true);
+					nova.setCartaoCreditoBean(r.getCartaoCreditoBean());
+					
 					/*
 					 * VERIFICAMOS SE O REGISTRO JA FOI ADICIONADO A NOSSA LISTA
 					 * QUE IRA ALIMENTAR A TABLE MODEL.
@@ -208,8 +210,6 @@ public class DespesaReceitaController {
 					if (!this.listaReceita.contains(nova)
 							&& !comparaPorDataVencimento(novaLista, nova)) {
 
-						nova.setFixa(true);
-						nova.setCartaoCreditoBean(r.getCartaoCreditoBean());
 						nova.setDataMovimentacao(null);
 						nova.setParcelaId(null);
 
@@ -274,6 +274,8 @@ public class DespesaReceitaController {
 					nova.setCategoriaBean(d.getCategoriaBean());
 					nova.setContaBean(d.getContaBean());
 					nova.setTipoBean(DESPESA);
+					nova.setCartaoCreditoBean(d.getCartaoCreditoBean());
+					nova.setFixa(true);
 
 					/*
 					 * VERIFICAMOS SE O REGISTRO JA FOI ADICIONADO A NOSSA LISTA
@@ -282,8 +284,6 @@ public class DespesaReceitaController {
 					if (!this.listaDespesa.contains(nova)
 							&& !comparaPorDataVencimento(novaLista, nova)) {
 
-						nova.setFixa(true);
-						nova.setCartaoCreditoBean(d.getCartaoCreditoBean());
 						nova.setDataMovimentacao(null);
 						nova.setParcelaId(null);
 
