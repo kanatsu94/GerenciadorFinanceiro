@@ -3,6 +3,7 @@ package controller;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -35,6 +36,7 @@ public class CartaoCreditoController {
 	private static String NULL_DESCRICAO = "- Informe uma descrição.\n";
 	private static String NULL_DIA_VENC = "- Informe o dia de vencimento.\n";
 	private static String NULL_DIA_FECH = "- Informe quantos dias antes do vencimento, a fatura fecha.\n";
+	private static String NULL_DATA_PAGAMENTO = "- Informe a data do pagamento.";
 	private static String TITLE_ERRO = "Cartão de Crédito - Erro";
 	private static String TITLE = "Cartão de Crédito";
 	private static String TITLE_EFETIVAR_ERRO = "Efetivar Cartão de Crédito - Erro";
@@ -234,7 +236,7 @@ public class CartaoCreditoController {
 				for (String s : erros) {
 					this.msg = this.msg + s + "\n";
 				}
-				
+
 				ExibeMensagem.showMessage(this.msg, this.title, this.type);
 			}
 		} else {
@@ -290,9 +292,11 @@ public class CartaoCreditoController {
 	/*
 	 * EFETIVA AS DESPESAS DO MES E ANO SELECIONADOS.
 	 */
-	public boolean efetivarCartao(Object cartao, int mes, int ano) {
+	public boolean efetivarCartao(Object cartao, int mes, int ano,
+			Date dataPagamento) {
 		DespesaReceitaController despesaReceitaController = new DespesaReceitaController();
 		int count = 0;
+		boolean flag = true;
 
 		if (ExibeMensagem.showQuestionMessage(QUESTION_EFETIVAR,
 				TITLE_EFETIVAR, 0) == 0) {
@@ -300,31 +304,39 @@ public class CartaoCreditoController {
 				if (this.listaDespesaFatura.isEmpty()) {
 					ExibeMensagem.showMessage(MSG_EFETIVAR_VAZIO,
 							TITLE_EFETIVAR, 2);
-					return false;
+					flag = false;
 				} else {
-					for (DespesaReceita d : this.listaDespesaFatura) {
-						DespesaReceita dr = d;
-						dr.setDataMovimentacao(new LocalDate());
-						if (despesaReceitaController.atualizarSemVerificao(dr)) {
-							count++;
-						} else {
-							ExibeMensagem.showMessage(
-									MSG_EFETIVAR_ERRO_PT1 + d.getDescricao()
-											+ MSG_EFETIVAR_ERRO_PT2 + count,
-									TITLE_EFETIVAR_ERRO, 0);
-							return false;
+					if (dataPagamento != null) {
+						for (DespesaReceita d : this.listaDespesaFatura) {
+							DespesaReceita dr = d;
+							dr.setDataMovimentacao(new LocalDate(dataPagamento));
+							if (despesaReceitaController
+									.atualizarSemVerificao(dr)) {
+								count++;
+							} else {
+								ExibeMensagem.showMessage(MSG_EFETIVAR_ERRO_PT1
+										+ d.getDescricao()
+										+ MSG_EFETIVAR_ERRO_PT2 + count,
+										TITLE_EFETIVAR_ERRO, 0);
+								flag = false;
+							}
 						}
+					} else {
+						ExibeMensagem.showMessage(NULL_DATA_PAGAMENTO,
+								TITLE_EFETIVAR_ERRO, 0);
+						flag = false;
 					}
-					ExibeMensagem.showMessage(count + MSG_EFETIVAR_SUCESSO,
-							TITLE_EFETIVAR, 1);
-					return true;
 				}
+				if(flag)
+					ExibeMensagem.showMessage(count + MSG_EFETIVAR_SUCESSO,
+						TITLE_EFETIVAR, 1);
+			} else {
+				ExibeMensagem.showMessage(MSG_EFETIVAR_ERRO_DATA,
+						TITLE_EFETIVAR_ERRO, 2);
 			}
-			ExibeMensagem.showMessage(MSG_EFETIVAR_ERRO_DATA,
-					TITLE_EFETIVAR_ERRO, 2);
 		}
 
-		return false;
+		return flag;
 	}
 
 	/*
@@ -349,7 +361,7 @@ public class CartaoCreditoController {
 	public JComboBox<CartaoCredito> getComboCartaoCredito(boolean ativo) {
 		JComboBox<CartaoCredito> combo = new JComboBox<CartaoCredito>();
 		CartaoCredito selecione = new CartaoCredito("Selecione...", (short) 0,
-				(short) 0);
+				(short) 0, false);
 
 		listaCartaoCredito = dao.listaTudo();
 

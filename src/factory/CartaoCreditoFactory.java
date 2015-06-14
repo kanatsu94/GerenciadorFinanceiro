@@ -22,7 +22,7 @@ public abstract class CartaoCreditoFactory {
 		else {
 			erros.clear();
 			CartaoCredito novo = new CartaoCredito(descricao, diaVencimento,
-					diaFechamento);
+					diaFechamento, true);
 			CartaoCreditoDAO daoCartao = new CartaoCreditoDAO();
 
 			if (!daoCartao.salvar(novo)) {

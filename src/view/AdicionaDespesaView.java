@@ -18,12 +18,12 @@ import javax.swing.JTextField;
 
 import net.miginfocom.swing.MigLayout;
 
-import util.JDatePanelImpl;
 import org.jdatepicker.impl.UtilDateModel;
 
 import util.DateLabelFormatter;
 import util.DecimalFieldDocument;
 import util.ExibeMensagem;
+import util.JDatePanelImpl;
 import util.JDatePickerImpl;
 import util.NumberFieldDocument;
 import util.TextFieldDocument;
@@ -69,6 +69,7 @@ public class AdicionaDespesaView extends JInternalFrame {
 
 		this.fieldDescricao = new JTextField();
 		this.fieldDescricao.setColumns(10);
+		
 		this.fieldValor = new JFormattedTextField();
 		this.fieldValor.setColumns(10);
 
@@ -281,7 +282,7 @@ public class AdicionaDespesaView extends JInternalFrame {
 
 	// FIELD
 	private JTextField fieldDescricao;
-	private JTextField fieldValor;
+	private JFormattedTextField fieldValor;
 	private JTextField fieldRepetir;
 
 	// CHECK

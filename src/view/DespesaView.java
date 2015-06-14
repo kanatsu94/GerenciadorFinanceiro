@@ -27,6 +27,8 @@ import org.joda.time.LocalDate;
 import util.ExibeMensagem;
 import util.NumberFieldDocument;
 import controller.DespesaReceitaController;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 public class DespesaView extends JInternalFrame {
 	/*
@@ -70,6 +72,11 @@ public class DespesaView extends JInternalFrame {
 		setIconifiable(true);
 
 		comboSituacao = new JComboBox(vetorPago);
+		comboSituacao.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+				filtrarAction();
+			}
+		});
 		comboSituacao.setBounds(20, 11, 190, 20);
 		comboSituacao.setToolTipText(DICA_COMBO_SITUACAO);
 
@@ -79,7 +86,7 @@ public class DespesaView extends JInternalFrame {
 		fieldBusca.setColumns(10);
 		fieldBusca.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				buscarAction(arg0);
+				filtrarAction();
 			}
 		});
 
@@ -89,21 +96,23 @@ public class DespesaView extends JInternalFrame {
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.setRowHeight(30);
 
-		btnBuscar = new JButton(BTN_BUSCAR);
-		btnBuscar.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buscarAction(evt);
-			}
-		});
-
 		lblTotal = new JLabel(LBL_TOTAL);
 		lblTotal.setFont(new Font("Tahoma", Font.PLAIN, 12));
 
 		comboMes = new JComboBox(vetorMes);
+		comboMes.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				filtrarAction();
+			}
+		});
 		comboMes.setToolTipText(DICA_COMBO_MES);
-		comboMes.setSelectedIndex(new LocalDate().getMonthOfYear() - 1);
 
 		fieldAno = new JTextField();
+		fieldAno.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				filtrarAction();
+			}
+		});
 		fieldAno.setDocument(new NumberFieldDocument());
 		fieldAno.setColumns(10);
 		fieldAno.setToolTipText(DICA_FIELD_ANO);
@@ -151,109 +160,46 @@ public class DespesaView extends JInternalFrame {
 		menuBar.add(btnEfetivarCartao);
 
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
-		groupLayout
-				.setHorizontalGroup(groupLayout
-						.createParallelGroup(Alignment.TRAILING)
-						.addGroup(
-								groupLayout
-										.createSequentialGroup()
-										.addContainerGap()
-										.addGroup(
-												groupLayout
-														.createParallelGroup(
-																Alignment.TRAILING)
-														.addComponent(
-																scrollPaneTabela,
-																Alignment.LEADING,
-																GroupLayout.DEFAULT_SIZE,
-																664,
-																Short.MAX_VALUE)
-														.addComponent(lblTotal)
-														.addGroup(
-																groupLayout
-																		.createSequentialGroup()
-																		.addComponent(
-																				fieldAno,
-																				GroupLayout.PREFERRED_SIZE,
-																				58,
-																				GroupLayout.PREFERRED_SIZE)
-																		.addPreferredGap(
-																				ComponentPlacement.RELATED)
-																		.addComponent(
-																				comboMes,
-																				GroupLayout.PREFERRED_SIZE,
-																				67,
-																				GroupLayout.PREFERRED_SIZE)
-																		.addPreferredGap(
-																				ComponentPlacement.UNRELATED)
-																		.addComponent(
-																				comboSituacao,
-																				GroupLayout.PREFERRED_SIZE,
-																				141,
-																				GroupLayout.PREFERRED_SIZE)
-																		.addPreferredGap(
-																				ComponentPlacement.UNRELATED)
-																		.addComponent(
-																				fieldBusca,
-																				GroupLayout.DEFAULT_SIZE,
-																				301,
-																				Short.MAX_VALUE)
-																		.addPreferredGap(
-																				ComponentPlacement.RELATED)
-																		.addComponent(
-																				btnBuscar)))
-										.addContainerGap()));
-		groupLayout
-				.setVerticalGroup(groupLayout
-						.createParallelGroup(Alignment.LEADING)
-						.addGroup(
-								groupLayout
-										.createSequentialGroup()
-										.addContainerGap()
-										.addGroup(
-												groupLayout
-														.createParallelGroup(
-																Alignment.BASELINE)
-														.addComponent(
-																btnBuscar,
-																GroupLayout.DEFAULT_SIZE,
-																31,
-																Short.MAX_VALUE)
-														.addComponent(
-																fieldBusca,
-																GroupLayout.DEFAULT_SIZE,
-																31,
-																Short.MAX_VALUE)
-														.addComponent(
-																fieldAno,
-																GroupLayout.PREFERRED_SIZE,
-																29,
-																GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																comboMes,
-																GroupLayout.PREFERRED_SIZE,
-																29,
-																GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																comboSituacao,
-																GroupLayout.PREFERRED_SIZE,
-																29,
-																GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(
-												ComponentPlacement.UNRELATED)
-										.addComponent(scrollPaneTabela,
-												GroupLayout.DEFAULT_SIZE, 363,
-												Short.MAX_VALUE).addGap(18)
-										.addComponent(lblTotal)
-										.addContainerGap()));
+		groupLayout.setHorizontalGroup(
+			groupLayout.createParallelGroup(Alignment.TRAILING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+						.addComponent(scrollPaneTabela, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
+						.addComponent(lblTotal)
+						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+							.addComponent(fieldAno, GroupLayout.PREFERRED_SIZE, 58, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(comboMes, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(comboSituacao, GroupLayout.PREFERRED_SIZE, 141, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(fieldBusca, GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)))
+					.addContainerGap())
+		);
+		groupLayout.setVerticalGroup(
+			groupLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(fieldBusca, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+						.addComponent(fieldAno, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)
+						.addComponent(comboMes, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)
+						.addComponent(comboSituacao, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(scrollPaneTabela, GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE)
+					.addGap(18)
+					.addComponent(lblTotal)
+					.addContainerGap())
+		);
 
 		scrollPaneTabela.setViewportView(table);
 		getContentPane().setLayout(groupLayout);
+		
+		comboMes.setSelectedIndex(new LocalDate().getMonthOfYear() - 1);
 		addDespesaView = null;
 		editDespesaView = null;
 		efetivarCartaoView = null;
-
-		this.carregaTabela(comboMes.getSelectedIndex() + 1, fieldAno.getText());
 	}
 
 	private void carregaTabela(int mes, String ano) {
@@ -274,7 +220,7 @@ public class DespesaView extends JInternalFrame {
 		this.columnModel.getColumn(5).setPreferredWidth(90);
 	}
 
-	private void buscarAction(java.awt.event.ActionEvent evt) {
+	private void filtrarAction() {
 		this.table.setModel(controllerDespesaReceita.buscar(
 				comboSituacao.getSelectedIndex(), fieldBusca.getText(), 1,
 				comboMes.getSelectedIndex() + 1,
@@ -418,7 +364,6 @@ public class DespesaView extends JInternalFrame {
 	private String BTN_EDITAR = "Editar";
 	private String BTN_ADICIONAR = "Adicionar";
 	private String BTN_REMOVER = "Remover";
-	private String BTN_BUSCAR = "Buscar";
 	private String BTN_EFETIVAR_CARTAO = "Efetivar Cartão de Crédito";
 	private String LBL_TOTAL = "Total: R$";
 	private String DICA_FIELD_BUSCAR = "Digite a descrição da despesa.";
@@ -442,7 +387,6 @@ public class DespesaView extends JInternalFrame {
 	private TableColumnModel columnModel;
 
 	private JTextField fieldBusca;
-	private JButton btnBuscar;
 	private JTable table;
 
 	private JLabel lblTotal;

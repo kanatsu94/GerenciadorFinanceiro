@@ -65,10 +65,11 @@ public class CartaoCredito implements Serializable, Comparable<CartaoCredito> {
 
 	// CONSTRUTOR COM OS ATRIBUTOS INDISPENSAVEIS PARA O OBJETO.
 	public CartaoCredito(String descricao, short vencimento,
-			short diasFechamento) {
+			short diasFechamento, boolean ativo) {
 		this.setDescricao(descricao);
 		this.setVencimento(vencimento);
 		this.setDiasFechamento(diasFechamento);
+		this.ativo = ativo;
 	}
 
 	public int getId() {
@@ -108,6 +109,11 @@ public class CartaoCredito implements Serializable, Comparable<CartaoCredito> {
 		this.vencimento = vencimento;
 		if (this.despesaReceitas != null)
 			for (DespesaReceita dr : this.despesaReceitas) {
+				/*
+				 * AO TROCAR A DATA DE VENCIMENTO DO CARTAO
+				 * VERIFICAMOS AS DESPESAS NAO PAGAS RELACIONADAS
+				 * A ELE, E SETAMOS A NOVA DATA DE VALIDADE.
+				 */
 				if(dr.getDataMovimentacao() == null)
 					dr.atualizaVencimento(vencimento);
 			}

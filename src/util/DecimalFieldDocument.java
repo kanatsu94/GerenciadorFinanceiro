@@ -26,20 +26,22 @@ public class DecimalFieldDocument extends PlainDocument {
 		super();
 		this.maxlength = maxlength;
 	}
-	
+
 	@Override
 	public void insertString(int offs, String str, AttributeSet a) {
 		try {
 			Double.parseDouble(str);
 		} catch (NumberFormatException ex) {
-			if(!str.equals(","))
+			if (!str.equals(","))
 				str = "";
 		}
 		try {
 			boolean fixedLengh = (!((getLength() + str.length()) > maxlength));
-			str = str.replace(".", ",");
-			if (maxlength == 0 || fixedLengh)
+
+			if (maxlength == 0 || fixedLengh && !str.isEmpty()) {
+				str = str.replace(".", ",");
 				super.insertString(offs, str, a);
+			}
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}

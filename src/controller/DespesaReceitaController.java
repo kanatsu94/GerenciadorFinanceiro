@@ -97,8 +97,7 @@ public class DespesaReceitaController {
 	}
 
 	/*
-	 * RECUPERA TODOS OS REGISTROS DE UM DETERMINADO
-	 * TIPO, NO BANCO DE DADOS.
+	 * RECUPERA TODOS OS REGISTROS DE UM DETERMINADO TIPO, NO BANCO DE DADOS.
 	 */
 	public List<DespesaReceita> listarTudo(Tipo t) {
 		List<DespesaReceita> lista;
@@ -107,10 +106,10 @@ public class DespesaReceitaController {
 
 		return lista;
 	}
-	
+
 	/*
-	 * CRIA A TABLE MODEL DE DESPESA OU RECEITA,
-	 * DE ACORDO COM OS PARAMETROS INFORMADOS.
+	 * CRIA A TABLE MODEL DE DESPESA OU RECEITA, DE ACORDO COM OS PARAMETROS
+	 * INFORMADOS.
 	 */
 	public DespesaReceitaTableModel buscar(int pago, String descricao,
 			int tipo, int mes, int ano) {
@@ -163,10 +162,9 @@ public class DespesaReceitaController {
 			return new DespesaReceitaTableModel(this.listaReceita);
 		}
 	}
-	
+
 	/*
-	 * CRIA A TABLE MODEL DE RECEITA COM
-	 * OS PARAMETROS INFORMADOS.
+	 * CRIA A TABLE MODEL DE RECEITA COM OS PARAMETROS INFORMADOS.
 	 */
 	public DespesaReceitaTableModel getReceitaTableModel(int mes, int ano) {
 		this.listaReceita = listarTudo(RECEITA);
@@ -192,34 +190,28 @@ public class DespesaReceitaController {
 					|| (r.getDataVencimento().getYear() < ano && r.getFixa())) {
 
 				/*
-				 * UMA COPIA DA RECEITA E CRIADA, COM SEU VALOR DE FIXO SETADO
-				 * PARA FALSE. ISSO E FEITO PARA VERIFICAR SE ESSA JA FOI
-				 * DESMARCADA COMO FIXO.
+				 * VERIFICA SE O ULTIMO REGISTRO DESSA RECEITA CONTINUA COMO
+				 * FIXO.
 				 */
-				DespesaReceita nova = new DespesaReceita(r.getDescricao(),
-						r.getDataVencimento().withMonthOfYear(mes)
-								.withYear(ano), r.getValor());
+				if (verificaFixa(novaLista, r)) {
+					DespesaReceita nova = new DespesaReceita(r.getDescricao(),
+							r.getDataVencimento().withMonthOfYear(mes)
+									.withYear(ano), r.getValor());
+					nova.setCategoriaBean(r.getCategoriaBean());
+					nova.setContaBean(r.getContaBean());
+					nova.setTipoBean(RECEITA);
 
-				nova.setCategoriaBean(r.getCategoriaBean());
-				nova.setFixa(false);
-				nova.setContaBean(r.getContaBean());
-
-				/*
-				 * EXECUTA A VERIFICACAO NA LISTA DE RECEITAS.
-				 */
-				if (!novaLista.contains(nova)) {
 					/*
-					 * SE NAO EXISTIR NENHUMA RECEITA COM FIXO FALSE, ENTAO
-					 * VOLTAMOS PARA TRUE E VERIFICAMOS SE ESSA RECEITA JA FOI
-					 * ADICIONADA A LISTA QUE IRA ALIMENTAR O TABLE MODEL.
+					 * VERIFICAMOS SE O REGISTRO JA FOI ADICIONADO A NOSSA LISTA
+					 * QUE IRA ALIMENTAR A TABLE MODEL.
 					 */
-					nova.setFixa(true);
 					if (!this.listaReceita.contains(nova)
 							&& !comparaPorDataVencimento(novaLista, nova)) {
+
+						nova.setFixa(true);
 						nova.setCartaoCreditoBean(r.getCartaoCreditoBean());
 						nova.setDataMovimentacao(null);
 						nova.setParcelaId(null);
-						nova.setTipoBean(RECEITA);
 
 						this.listaReceita.add(nova);
 					}
@@ -246,8 +238,7 @@ public class DespesaReceitaController {
 	}
 
 	/*
-	 * CRIA A TABLE MODEL DE DESPESA COM
-	 * OS PARAMETROS INFORMADOS.
+	 * CRIA A TABLE MODEL DE DESPESA COM OS PARAMETROS INFORMADOS.
 	 */
 	public DespesaReceitaTableModel getDespesaTableModel(int mes, int ano) {
 		this.listaDespesa = listarTudo(DESPESA);
@@ -265,7 +256,7 @@ public class DespesaReceitaController {
 			}
 			/*
 			 * VERIFICA SE A DATA DE VENCIMENTO DA DESPESA E MENOR QUE A DATA
-			 * SELECIONADA SE FOR MENOR E A DESPESA FOR FIXA, ENTAO CRIAMOS A
+			 * SELECIONADA, SE FOR MENOR E A DESPESA FOR FIXA, ENTAO CRIAMOS A
 			 * DESPESA.
 			 */
 			else if ((d.getDataVencimento().getMonthOfYear() < mes
@@ -273,34 +264,28 @@ public class DespesaReceitaController {
 					|| (d.getDataVencimento().getYear() < ano && d.getFixa())) {
 
 				/*
-				 * UMA COPIA DA DESPESA E CRIADA, COM SEU VALOR DE FIXO SETADO
-				 * PARA FALSE. ISSO E FEITO PARA VERIFICAR SE ESSA JA FOI
-				 * DESMARCADA COMO FIXO.
+				 * VERIFICA SE O ULTIMO REGISTRO DESSA DESPESA CONTINUA COMO
+				 * FIXO.
 				 */
-				DespesaReceita nova = new DespesaReceita(d.getDescricao(),
-						d.getDataVencimento().withMonthOfYear(mes)
-								.withYear(ano), d.getValor());
+				if (verificaFixa(novaLista, d)) {
+					DespesaReceita nova = new DespesaReceita(d.getDescricao(),
+							d.getDataVencimento().withMonthOfYear(mes)
+									.withYear(ano), d.getValor());
+					nova.setCategoriaBean(d.getCategoriaBean());
+					nova.setContaBean(d.getContaBean());
+					nova.setTipoBean(DESPESA);
 
-				nova.setCategoriaBean(d.getCategoriaBean());
-				nova.setFixa(false);
-				nova.setContaBean(d.getContaBean());
-
-				/*
-				 * EXECUTA A VERIFICACAO NA LISTA DE DESPESAS.
-				 */
-				if (!novaLista.contains(nova)) {
 					/*
-					 * SE NAO EXISTIR NENHUMA DESPESA COM FIXO FALSE, ENTAO
-					 * VOLTAMOS PARA TRUE E VERIFICAMOS SE ESSA DESPESA JA FOI
-					 * ADICIONADA A LISTA QUE IRA ALIMENTAR O TABLE MODEL.
+					 * VERIFICAMOS SE O REGISTRO JA FOI ADICIONADO A NOSSA LISTA
+					 * QUE IRA ALIMENTAR A TABLE MODEL.
 					 */
-					nova.setFixa(true);
 					if (!this.listaDespesa.contains(nova)
 							&& !comparaPorDataVencimento(novaLista, nova)) {
+
+						nova.setFixa(true);
 						nova.setCartaoCreditoBean(d.getCartaoCreditoBean());
 						nova.setDataMovimentacao(null);
 						nova.setParcelaId(null);
-						nova.setTipoBean(DESPESA);
 
 						this.listaDespesa.add(nova);
 					}
@@ -326,9 +311,22 @@ public class DespesaReceitaController {
 		return new DespesaReceitaTableModel(this.listaDespesa);
 	}
 
+	private boolean verificaFixa(List<DespesaReceita> lista, DespesaReceita dr) {
+		ArrayList<DespesaReceita> listaFixa = new ArrayList<>();
+
+		for (DespesaReceita t : lista) {
+			if (t.equals(dr)) {
+				listaFixa.add(t);
+			}
+		}
+
+		Collections.sort(listaFixa);
+
+		return listaFixa.get(listaFixa.size() - 1).getFixa();
+	}
+
 	/*
-	 * VERIFICA SE UMA DESPESA/RECEITA E IGUAL
-	 * CONSIDERANDO A DATA DE VENCIMENTO
+	 * VERIFICA SE UMA DESPESA/RECEITA E IGUAL CONSIDERANDO A DATA DE VENCIMENTO
 	 */
 	private boolean comparaPorDataVencimento(List<DespesaReceita> lista,
 			DespesaReceita dr) {
@@ -411,8 +409,7 @@ public class DespesaReceitaController {
 	}
 
 	/*
-	 * VERIFICA SE EXISTEM CAMPOS OBRIGATORIOS
-	 * QUE NAO FORAM PREENCHIDOS.
+	 * VERIFICA SE EXISTEM CAMPOS OBRIGATORIOS QUE NAO FORAM PREENCHIDOS.
 	 */
 	private boolean validaCampos(String descricao, Date dataVencimento,
 			Date dataMovimentacao, String valor, boolean pago,
@@ -556,10 +553,17 @@ public class DespesaReceitaController {
 			dr.setFixa(fixa);
 			dr.setCategoriaBean((Categoria) categoria);
 			dr.setContaBean((Conta) conta);
-			if (((CartaoCredito) cartaoCredito).getId() <= 0) {
-				dr.setCartaoCreditoBean(null);
-			} else
-				dr.setCartaoCreditoBean((CartaoCredito) cartaoCredito);
+
+			/*
+			 * CONFERE SE O TIPO E DE DESPESA OU DE RECEITA. SE FOR RECEITA,
+			 * IGNORA O CARTAO DE CREDITO.
+			 */
+			if (tipo == 1) {
+				if (((CartaoCredito) cartaoCredito).getId() <= 0) {
+					dr.setCartaoCreditoBean(null);
+				} else
+					dr.setCartaoCreditoBean((CartaoCredito) cartaoCredito);
+			}
 
 			LocalDate movimentacao;
 
@@ -655,7 +659,8 @@ public class DespesaReceitaController {
 		EditarDespesaView editarDespesaView = new EditarDespesaView();
 
 		DespesaReceita dr = listaDespesa.get(linha);
-		dr = dao.procurar(dr.getId());
+		if (dr.getId() != 0)
+			dr = dao.procurar(dr.getId());
 
 		JComboBox comboConta = getComboConta();
 		comboConta.setSelectedItem(dr.getContaBean());
@@ -664,15 +669,14 @@ public class DespesaReceitaController {
 		comboCategoria.setSelectedItem(dr.getCategoriaBean());
 
 		JComboBox comboCartao = getComboCartaoCredito(true);
-		if (dr.getCartaoCreditoBean() != null){
-			if(dr.getCartaoCreditoBean().getAtivo())
+		if (dr.getCartaoCreditoBean() != null) {
+			if (dr.getCartaoCreditoBean().getAtivo())
 				comboCartao.setSelectedItem(dr.getCartaoCreditoBean());
-			else{
+			else {
 				comboCartao.addItem(dr.getCartaoCreditoBean());
-				comboCartao.setSelectedIndex(comboCartao.getItemCount()-1);
+				comboCartao.setSelectedIndex(comboCartao.getItemCount() - 1);
 			}
-		}
-		else
+		} else
 			comboCartao.setSelectedIndex(0);
 
 		editarDespesaView.setCod(dr.getId());
@@ -694,7 +698,7 @@ public class DespesaReceitaController {
 	}
 
 	/*
-	 *  CRIA O JCOMBOBOX DE CONTA
+	 * CRIA O JCOMBOBOX DE CONTA
 	 */
 	public JComboBox<Conta> getComboConta() {
 		JComboBox<Conta> combo = new JComboBox<Conta>();
@@ -710,7 +714,7 @@ public class DespesaReceitaController {
 	}
 
 	/*
-	 *  CRIA O JCOMBOBOX DE CATEGORIA DE DESPESA
+	 * CRIA O JCOMBOBOX DE CATEGORIA DE DESPESA
 	 */
 	public JComboBox<Categoria> getComboCategoriaDespesa() {
 		JComboBox<Categoria> combo = new JComboBox<Categoria>();
@@ -727,7 +731,7 @@ public class DespesaReceitaController {
 	}
 
 	/*
-	 *  CRIA O JCOMBOBOX DE CATEGORIA DE RECEITA
+	 * CRIA O JCOMBOBOX DE CATEGORIA DE RECEITA
 	 */
 	public JComboBox<Categoria> getComboCategoriaReceita() {
 		JComboBox<Categoria> combo = new JComboBox<Categoria>();
@@ -744,8 +748,8 @@ public class DespesaReceitaController {
 	}
 
 	/*
-	 * UTILIZA O CONTROLLER DE CARTAO DE CREDITO PARA RECUPERAR
-	 * UM COMBOBOX DE CARTAO DE CREDITO.
+	 * UTILIZA O CONTROLLER DE CARTAO DE CREDITO PARA RECUPERAR UM COMBOBOX DE
+	 * CARTAO DE CREDITO.
 	 */
 	public JComboBox<CartaoCredito> getComboCartaoCredito(boolean ativo) {
 		return cartaoController.getComboCartaoCredito(ativo);

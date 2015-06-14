@@ -218,13 +218,18 @@ public class DespesaReceita implements Serializable, Comparable<DespesaReceita> 
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime
+				* result
+				+ ((cartaoCreditoBean == null) ? 0 : cartaoCreditoBean
+						.hashCode());
 		result = prime * result
 				+ ((categoriaBean == null) ? 0 : categoriaBean.hashCode());
 		result = prime * result
 				+ ((contaBean == null) ? 0 : contaBean.hashCode());
 		result = prime * result
 				+ ((descricao == null) ? 0 : descricao.hashCode());
-		result = prime * result + (fixa ? 1231 : 1237);
+		result = prime * result
+				+ ((tipoBean == null) ? 0 : tipoBean.hashCode());
 		result = prime * result + ((valor == null) ? 0 : valor.hashCode());
 		return result;
 	}
@@ -238,6 +243,11 @@ public class DespesaReceita implements Serializable, Comparable<DespesaReceita> 
 		if (getClass() != obj.getClass())
 			return false;
 		DespesaReceita other = (DespesaReceita) obj;
+		if (cartaoCreditoBean == null) {
+			if (other.cartaoCreditoBean != null)
+				return false;
+		} else if (!cartaoCreditoBean.equals(other.cartaoCreditoBean))
+			return false;
 		if (categoriaBean == null) {
 			if (other.categoriaBean != null)
 				return false;
@@ -253,7 +263,10 @@ public class DespesaReceita implements Serializable, Comparable<DespesaReceita> 
 				return false;
 		} else if (!descricao.equals(other.descricao))
 			return false;
-		if (fixa != other.fixa)
+		if (tipoBean == null) {
+			if (other.tipoBean != null)
+				return false;
+		} else if (!tipoBean.equals(other.tipoBean))
 			return false;
 		if (valor == null) {
 			if (other.valor != null)
@@ -262,5 +275,4 @@ public class DespesaReceita implements Serializable, Comparable<DespesaReceita> 
 			return false;
 		return true;
 	}
-
 }
