@@ -251,26 +251,22 @@ public class CartaoCreditoController {
 	 */
 	public ArrayList<String> getResumoCartaoCredito(Object cartao, int mes,
 			int ano) {
-		this.listaDespesaFatura.clear();
-		CartaoCredito cartaoCredito = dao.procurar(((CartaoCredito) cartao)
-				.getId());
+		DespesaReceitaController controllerDespesaReceita = new DespesaReceitaController();
 		ArrayList<DespesaReceita> lista = new ArrayList<>();
 		Double valorTotal = 0.0;
 		ArrayList<String> resumo = new ArrayList<String>();
-
-		for (DespesaReceita d : cartaoCredito.getDespesaReceitas()) {
-			if (d.getDataVencimento().getMonthOfYear() == mes
-					&& d.getDataVencimento().getYear() == ano
-					&& d.getDataMovimentacao() == null) {
-				lista.add(d);
-			}
+		this.listaDespesaFatura = controllerDespesaReceita.getListaDespesa(mes, ano);
+		
+		for(DespesaReceita dr : this.listaDespesaFatura){
+			if(dr.getDataMovimentacao() == null && dr.getCartaoCreditoBean().equals(((CartaoCredito)cartao)))
+				lista.add(dr);
 		}
-
+		this.listaDespesaFatura.clear();
 		this.listaDespesaFatura.addAll(lista);
 
 		resumo.add("O dia de vencimento da fatura é "
-				+ cartaoCredito.getVencimento() + ".");
-		resumo.add("A fatura fecha " + cartaoCredito.getDiasFechamento()
+				+ ((CartaoCredito)cartao).getVencimento() + ".");
+		resumo.add("A fatura fecha " + ((CartaoCredito)cartao).getDiasFechamento()
 				+ " dias antes do vencimento.");
 
 		if (lista.isEmpty()) {

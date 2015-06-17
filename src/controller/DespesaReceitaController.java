@@ -236,11 +236,18 @@ public class DespesaReceitaController {
 
 		return new DespesaReceitaTableModel(this.listaReceita);
 	}
-
+	
 	/*
 	 * CRIA A TABLE MODEL DE DESPESA COM OS PARAMETROS INFORMADOS.
 	 */
-	public DespesaReceitaTableModel getDespesaTableModel(int mes, int ano) {
+	public DespesaReceitaTableModel getDespesaTableModel(int mes, int ano) {	
+		return new DespesaReceitaTableModel(getListaDespesa(mes, ano));
+	}
+	
+	/*
+	 * CRIA A LISTA DE DESPESA COM OS PARAMETROS INFORMADOS.
+	 */
+	public List<DespesaReceita> getListaDespesa(int mes, int ano) {
 		this.listaDespesa = listarTudo(DESPESA);
 		List<DespesaReceita> novaLista = new ArrayList<>();
 		novaLista.addAll(this.listaDespesa);
@@ -308,7 +315,7 @@ public class DespesaReceitaController {
 				+ df.format(naoPago) + " | Total: R$"
 				+ df.format(pago + naoPago);
 
-		return new DespesaReceitaTableModel(this.listaDespesa);
+		return this.listaDespesa;
 	}
 
 	private boolean verificaFixa(List<DespesaReceita> lista, DespesaReceita dr) {
@@ -368,22 +375,26 @@ public class DespesaReceitaController {
 		this.title = TITLE_ADD + tipo.getDescricao();
 		this.type = 0;
 		boolean flag = true;
-
+		
 		if (validaCampos(descricao, dataVencimento, dataMovimentacao, valor,
 				pago, cartaoCredito)) {
-			LocalDate movimentacao = null;
+			LocalDate localDateMovimentacao = null;
+			LocalDate localDateVencimento = null;
 			this.title = tipo.getDescricao();
 
 			if (parcelas.equals(""))
 				parcelas = "1";
 			if (dataMovimentacao != null)
-				movimentacao = new LocalDate(dataMovimentacao);
+				localDateMovimentacao = new LocalDate(dataMovimentacao);
 			if (cartaoCredito != null)
 				if (((CartaoCredito) cartaoCredito).getId() == 0)
 					cartaoCredito = null;
-
+			if(dataVencimento != null)
+				localDateVencimento = new LocalDate(dataVencimento);
+			
+			
 			ArrayList<String> erros = DespesaReceitaFactory.novaDespesaReceita(
-					descricao, new LocalDate(dataVencimento), movimentacao,
+					descricao, localDateVencimento, localDateMovimentacao,
 					Double.parseDouble(valor.replace(",", ".")), fixa,
 					(Categoria) categoria, tipo, (Conta) conta,
 					(CartaoCredito) cartaoCredito, Integer.parseInt(parcelas));

@@ -27,8 +27,13 @@ public abstract class DespesaReceitaFactory {
 		ParcelaSeq parcelaSeq;
 		ParcelaSeqDAO daoParcela;
 		DespesaReceitaDAO daoDespesaReceita = new DespesaReceitaDAO();
-		LocalDate dateAux = dataVencimento;
-
+		LocalDate dateAux;
+		
+		if(dataVencimento == null)
+			dateAux = new LocalDate();
+		else
+			dateAux = dataVencimento;
+		
 		ArrayList<String> erros = new ArrayList<String>();
 
 		// SE A DESPESA/RECEITA FOR REPETIR, ENTAO PEGAMOS UM IDENTIFICADOR
@@ -49,7 +54,7 @@ public abstract class DespesaReceitaFactory {
 
 		// LACO DE REPETICAO QUE IRA CRIAR AS DESPESAS/RECEITAS.
 		for (int i = 0, j = 0; i < parcelas; i++) {
-			if (cartaoCredito != null) {
+			if (cartaoCredito != null && dataVencimento == null) {
 				dataVencimento = getDataVencimento(cartaoCredito, (i + j));
 
 				if (i == 0
@@ -88,6 +93,8 @@ public abstract class DespesaReceitaFactory {
 				erros.add("\nRegistros salvos: " + i);
 				return erros;
 			}
+			
+			dataVencimento = null;
 		}
 
 		return erros;
